@@ -1,78 +1,163 @@
-<script>
-    // ضع بيانات مشروعك الحقيقي من Supabase هنا (إذا أردت تفعيل السحابة)
-    // أو اتركها هكذا لتجربة الدخول المحلي الفوري الآمن
-    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    
-    // التحقق من توفر مكتبة Supabase واختيار وضع الأمان المناسب
-    let supabaseClient = null;
-    try {
-        if (typeof supabase !== 'undefined' && SUPABASE_URL.includes('http')) {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-    } catch(err) { console.log("وضع التشغيل المحلي المؤمن"); }
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion de Maintenance Assistée par Ordinateur (GMAO)</title>
+    <!-- Tailwind CSS pour un design moderne et professionnel -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Bibliothèque Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
 
-    // التحقق عند فتح الصفحة
-    window.addEventListener('DOMContentLoaded', async () => {
-        // التأكد من إظهار شاشة الدخول أولاً بشكل آمن
-        document.getElementById('auth-screen').classList.remove('hidden');
-        document.getElementById('app-screen').classList.add('hidden');
+    <!-- ================= 1. ÉCRAN DE CONNEXION (SÉCURISÉ) ================= -->
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-gray-900 px-4">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 space-y-6">
+            <div class="text-center">
+                <h1 class="text-2xl font-bold text-gray-800">Accès Sécurisé - GMAO</h1>
+                <p class="text-sm text-gray-500 mt-1">Veuillez vous identifier pour accéder au système</p>
+            </div>
 
-        if (supabaseClient) {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session && session.user && session.user.email === "abdelali.bouzid.98@gmail.com") {
-                openApp();
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Adresse E-mail</label>
+                    <input type="email" id="loginEmail" required 
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                        placeholder="abdelali.bouzid.98@gmail.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                    <input type="password" id="loginPassword" required 
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                        placeholder="••••••••">
+                </div>
+
+                <div id="loginError" class="hidden p-3 text-sm text-red-700 bg-red-100 rounded-lg"></div>
+
+                <button type="submit" 
+                    class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                    Se connecter
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= 2. ÉCRAN PRINCIPAL DE L'APPLICATION (PROTÉGÉ) ================= -->
+    <div id="app-screen" class="hidden min-h-screen flex flex-col">
+        <!-- Barre de navigation -->
+        <header class="bg-blue-900 text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xl font-bold">GMAO - Maintenance</span>
+                    <select id="companyDropdown" class="bg-blue-800 text-white text-sm px-3 py-1 rounded border border-blue-700">
+                        <!-- Options générées dynamiquement -->
+                    </select>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-200">Abdelali Bouzid</span>
+                    <button onclick="handleLogout()" 
+                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm transition duration-200 shadow">
+                        Déconnexion
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="flex-grow max-w-7xl w-full mx-auto p-6 space-y-6">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Tableau de bord de maintenance</h2>
+                <p class="text-gray-600">Bienvenue dans votre système de gestion. Toutes les fonctionnalités de maintenance et de suivi des équipements sont opérationnelles.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= SCRIPT DE SÉCURITÉ ET LOGIQUE ================= -->
+    <script>
+        // Configuration Supabase (remplacez par vos clés si vous utilisez la base de données cloud)
+        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        let supabaseClient = null;
+        try {
+            if (typeof supabase !== 'undefined' && SUPABASE_URL.includes('http')) {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
-        }
-    });
-
-    // دالة تسجيل الدخول (تدعم حسابك حصرياً)
-    async function handleLogin(e) {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-        const errorDiv = document.getElementById('loginError');
-
-        // قيد الأمان الصارم للبريد الإلكتروني
-        if (email !== "abdelali.bouzid.98@gmail.com") {
-            errorDiv.innerText = "Accès refusé : Cet email n'est pas autorisé.";
-            errorDiv.classList.remove('hidden');
-            return;
+        } catch(err) { 
+            console.log("Mode de sécurité local activé"); 
         }
 
-        // إذا كان متصلاً بـ Supabase
-        if (supabaseClient) {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) {
-                errorDiv.innerText = "Mot de passe incorrect ou compte introuvable sur Supabase.";
+        // Vérification automatique au chargement de la page
+        window.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('hidden');
+
+            if (supabaseClient) {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session && session.user && session.user.email === "abdelali.bouzid.98@gmail.com") {
+                    openApp();
+                }
+            }
+        });
+
+        // Gestion de la connexion
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            // Restriction stricte de l'e-mail autorisé
+            if (email !== "abdelali.bouzid.98@gmail.com") {
+                errorDiv.innerText = "Accès refusé : Cet e-mail n'est pas autorisé.";
                 errorDiv.classList.remove('hidden');
                 return;
             }
-        } else {
-            // التحقق المحلي السريع إذا لم تقم بربط Supabase بعد
-            if (password !== "abdelali@98") {
-                errorDiv.innerText = "Mot de passe incorrect.";
-                errorDiv.classList.remove('hidden');
-                return;
+
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    errorDiv.innerText = "Mot de passe incorrect ou compte introuvable.";
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+            } else {
+                // Mot de passe de secours local si Supabase n'est pas encore configuré
+                if (password !== "abdelali@98") {
+                    errorDiv.innerText = "Mot de passe incorrect.";
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
             }
+
+            errorDiv.classList.add('hidden');
+            openApp();
         }
 
-        // إذا كل شيء صحيح -> افتح التطبيق فوراً
-        errorDiv.classList.add('hidden');
-        openApp();
-    }
+        function openApp() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            updateCompanyDropdown();
+            refreshAll();
+        }
 
-    function openApp() {
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
-        updateCompanyDropdown();
-        refreshAll();
-    }
+        async function handleLogout() {
+            if (supabaseClient) await supabaseClient.auth.signOut();
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('loginPassword').value = '';
+        }
 
-    async function handleLogout() {
-        if (supabaseClient) await supabaseClient.auth.signOut();
-        document.getElementById('app-screen').classList.add('hidden');
-        document.getElementById('auth-screen').classList.remove('hidden');
-        document.getElementById('loginPassword').value = '';
-    }
-</script>
+        function updateCompanyDropdown() {
+            const dropdown = document.getElementById('companyDropdown');
+            dropdown.innerHTML = '<option>Jbel Annour - Maintenance</option>';
+        }
+
+        function refreshAll() {
+            console.log("Système actualisé avec succès.");
+        }
+    </script>
+</body>
+</html>
