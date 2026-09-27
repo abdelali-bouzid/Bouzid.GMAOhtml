@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Système de Gestion de Maintenance Assistée par Ordinateur (GMAO)</title>
+    <title>GMAO - Système de Gestion de Maintenance</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Supabase JS -->
@@ -11,12 +11,12 @@
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
-    <!-- ================= 1. ÉCRAN DE CONNEXION ================= -->
+    <!-- ================= 1. ÉCRAN DE CONNEXION SÉCURISÉ ================= -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-gray-900 px-4">
         <div class="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 space-y-6">
             <div class="text-center">
                 <h1 class="text-2xl font-bold text-gray-800">Accès Sécurisé - GMAO</h1>
-                <p class="text-sm text-gray-500 mt-1">Veuillez vous identifier pour accéder au système</p>
+                <p class="text-sm text-gray-500 mt-1">Jbel Annour - Maintenance</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
@@ -44,17 +44,19 @@
         </div>
     </div>
 
-    <!-- ================= 2. ÉCRAN PRINCIPAL ================= -->
+    <!-- ================= 2. ÉCRAN PRINCIPAL DE L'APPLICATION (TOUTES VOS DONNÉES) ================= -->
     <div id="app-screen" class="hidden min-h-screen flex flex-col">
+        <!-- Barre de navigation -->
         <header class="bg-blue-900 text-white shadow-md">
             <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
                 <div class="flex items-center space-x-4">
-                    <span class="text-xl font-bold">GMAO - Maintenance</span>
+                    <span class="text-xl font-bold">GMAO - Jbel Annour</span>
                     <select id="companyDropdown" class="bg-blue-800 text-white text-sm px-3 py-1 rounded border border-blue-700">
+                        <option>Jbel Annour - Maintenance</option>
                     </select>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-200">Abdelali Bouzid</span>
+                    <span class="text-sm text-gray-200">Abdelali Bouzid (Technicien Méthodes)</span>
                     <button onclick="handleLogout()" 
                         class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm transition duration-200 shadow">
                         Déconnexion
@@ -63,30 +65,65 @@
             </div>
         </header>
 
+        <!-- Contenu et Tableaux du Système de Maintenance -->
         <main class="flex-grow max-w-7xl w-full mx-auto p-6 space-y-6">
-            <div class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Tableau de bord de maintenance</h2>
-                <p class="text-gray-600">Bienvenue dans votre système de gestion. Toutes les fonctionnalités sont opérationnelles.</p>
+            
+            <!-- Statistiques / Cartes Rapides -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
+                    <h3 class="text-gray-500 text-sm font-medium">Interventions en Cours</h3>
+                    <p id="stat-pending" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
+                    <h3 class="text-gray-500 text-sm font-medium">Équipements Actifs</h3>
+                    <p id="stat-equipments" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-yellow-600">
+                    <h3 class="text-gray-500 text-sm font-medium">Pièces en Stock</h3>
+                    <p id="stat-stock" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                </div>
             </div>
+
+            <!-- Section des Tableaux de Gestion (GMAO) -->
+            <div class="bg-white rounded-xl shadow p-6 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Gestion des Équipements et Interventions</h2>
+                    <div class="space-x-2">
+                        <button onclick="addNewItem()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                            + Ajouter un élément
+                        </button>
+                        <button onclick="refreshAll()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm transition">
+                            Actualiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- جدول البيانات الرئيسي -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID / Code</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Désignation Équipement</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type de Maintenance</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gmaoTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- سيتم تعبئة البيانات هنا تلقائياً -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- ================= SCRIPT ================= -->
+    <!-- ================= SCRIPTS ET LOGIQUE DU SYSTÈME ================= -->
     <script>
-        // مفاتيح Supabase (اختيارية حالياً لضمان عدم تعطل الصفحة)
-        const SUPABASE_URL = '';
-        const SUPABASE_ANON_KEY = '';
-        
-        let supabaseClient = null;
-        try {
-            if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-        } catch(err) { console.log("Mode local actif"); }
-
-        // التحقق عند فتح الصفحة (البقاء في شاشة الدخول إذا لم يتم تسجيل الدخول مسبقاً)
-        window.addEventListener('DOMContentLoaded', async () => {
-            // التحقق من وجود جلسة محلية سابقة محفوظة في المتصفح
+        // التحقق عند فتح الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
             const localAuth = localStorage.getItem('gmao_logged');
             if (localAuth === 'true') {
                 openApp();
@@ -96,24 +133,22 @@
             }
         });
 
-        // دالة تسجيل الدخول (مع حماية البريد وكلمة المرور)
-        async function handleLogin(e) {
+        // دالة تسجيل الدخول
+        function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             const errorDiv = document.getElementById('loginError');
 
-            // قيد البريد الإلكتروني الصارم
             if (email !== "abdelali.bouzid.98@gmail.com") {
                 errorDiv.innerText = "Accès refusé : Cet e-mail n'est pas autorisé.";
                 errorDiv.classList.remove('hidden');
                 return;
             }
 
-            // التحقق من كلمة المرور (كلمة المرور الخاصة بك هي abdelali@98)
             if (password === "abdelali@98") {
                 errorDiv.classList.add('hidden');
-                localStorage.setItem('gmao_logged', 'true'); // حفظ الجلسة لكي لا يطلبها كل مرة
+                localStorage.setItem('gmao_logged', 'true');
                 openApp();
             } else {
                 errorDiv.innerText = "Mot de passe incorrect.";
@@ -121,27 +156,56 @@
             }
         }
 
+        // فتح واجهة التطبيق واسترجاع المعطيات
         function openApp() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
-            updateCompanyDropdown();
             refreshAll();
         }
 
+        // تسجيل الخروج
         function handleLogout() {
-            localStorage.removeItem('gmao_logged'); // مسح الجلسة عند الخروج
+            localStorage.removeItem('gmao_logged');
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('loginPassword').value = '';
         }
 
-        function updateCompanyDropdown() {
-            const dropdown = document.getElementById('companyDropdown');
-            dropdown.innerHTML = '<option>Jbel Annour - Maintenance</option>';
+        // تحديث وعرض البيانات (الجداول والإحصائيات)
+        function refreshAll() {
+            // بيانات تجريبية افتراضية للمتابعة (يمكنك ربطها لاحقاً بقاعدة بياناتك السابقة)
+            const sampleData = [
+                { id: "EQ-001", name: "Ligne d'embouteillage - Moteur Principal", type: "Préventive", status: "Opérationnel" },
+                { id: "EQ-002", name: "Compresseur d'air Atlas Copco", type: "Curative", status: "En attente de pièces" },
+                { id: "EQ-003", name: "Tapis transporteur N°3", type: "Améliorative", status: "En maintenance" }
+            ];
+
+            const tbody = document.getElementById('gmaoTableBody');
+            tbody.innerHTML = '';
+
+            sampleData.forEach(item => {
+                let statusColor = item.status === 'Opérationnel' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.type}</td>
+                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">${item.status}</span></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button onclick="alert('Détails de l\'équipement ${item.id}')" class="text-blue-600 hover:text-blue-900">Consulter</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // تحديث الإحصائيات
+            document.getElementById('stat-pending').innerText = "2";
+            document.getElementById('stat-equipments').innerText = "14";
+            document.getElementById('stat-stock').innerText = "48";
         }
 
-        function refreshAll() {
-            console.log("Système actualisé.");
+        function addNewItem() {
+            alert("Fonctionnalité d'ajout d'un nouvel équipement ou intervention.");
         }
     </script>
 </body>
