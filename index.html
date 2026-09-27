@@ -1,212 +1,638 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GMAO - Système de Gestion de Maintenance</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>SMART MAINTENANCE PRO - GMAO & PLANNING</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .node-circle { transition: all 0.3s ease; cursor: pointer; }
+        .node-circle:hover { transform: scale(1.05); filter: brightness(1.2); }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-report, #printable-report * { visibility: visible; }
+            #printable-report { position: absolute; left: 0; top: 0; width: 100%; background: white; color: black; }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body class="flex flex-col min-h-full text-slate-100 bg-slate-950">
 
-    <!-- ================= 1. ÉCRAN DE CONNEXION SÉCURISÉ ================= -->
-    <div id="auth-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-gray-900 px-4">
-        <div class="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 space-y-6">
-            <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-800">Accès Sécurisé - GMAO</h1>
-                <p class="text-sm text-gray-500 mt-1">Jbel Annour - Maintenance</p>
+<!-- ÉCRAN DE CONNEXION -->
+<div id="auth-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl mb-4 border border-indigo-500/20">
+                <i class="fa-solid fa-gears text-3xl"></i>
             </div>
-
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Adresse E-mail</label>
-                    <input type="email" id="loginEmail" required 
-                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                        value="abdelali.bouzid.98@gmail.com">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
-                    <input type="password" id="loginPassword" required 
-                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                        placeholder="••••••••">
-                </div>
-
-                <div id="loginError" class="hidden p-3 text-sm text-red-700 bg-red-100 rounded-lg"></div>
-
-                <button type="submit" 
-                    class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200">
-                    Se connecter
-                </button>
-            </form>
+            <h2 class="text-2xl font-bold text-white">Smart Maintenance Pro</h2>
+            <p class="text-xs text-slate-400 mt-1">GMAO • Planning • Stock & Images • KPIs</p>
         </div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Identifiant / Email</label>
+                <input type="text" id="loginEmail" required value="admin@usine.com" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Mot de passe</label>
+                <input type="password" id="loginPassword" required value="admin123" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg transition duration-200">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i> Se Connecter
+            </button>
+        </form>
     </div>
+</div>
 
-    <!-- ================= 2. ÉCRAN PRINCIPAL DE L'APPLICATION (TOUTES VOS DONNÉES) ================= -->
-    <div id="app-screen" class="hidden min-h-screen flex flex-col">
-        <!-- Barre de navigation -->
-        <header class="bg-blue-900 text-white shadow-md">
-            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-4">
-                    <span class="text-xl font-bold">GMAO - Jbel Annour</span>
-                    <select id="companyDropdown" class="bg-blue-800 text-white text-sm px-3 py-1 rounded border border-blue-700">
-                        <option>Jbel Annour - Maintenance</option>
-                    </select>
+<!-- APPLICATION PRINCIPALE -->
+<div id="app-screen" class="hidden flex flex-col min-h-screen">
+    <header class="bg-slate-900 border-b border-slate-800 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 border border-indigo-500/30">
+                    <i class="fa-solid fa-industry text-lg"></i>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-200">Abdelali Bouzid (Technicien Méthodes)</span>
-                    <button onclick="handleLogout()" 
-                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm transition duration-200 shadow">
-                        Déconnexion
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Contenu et Tableaux du Système de Maintenance -->
-        <main class="flex-grow max-w-7xl w-full mx-auto p-6 space-y-6">
-            
-            <!-- Statistiques / Cartes Rapides -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
-                    <h3 class="text-gray-500 text-sm font-medium">Interventions en Cours</h3>
-                    <p id="stat-pending" class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
-                    <h3 class="text-gray-500 text-sm font-medium">Équipements Actifs</h3>
-                    <p id="stat-equipments" class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-yellow-600">
-                    <h3 class="text-gray-500 text-sm font-medium">Pièces en Stock</h3>
-                    <p id="stat-stock" class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                </div>
+                <h1 class="text-lg font-bold tracking-wide">GMAO PRO <span class="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full">V15</span></h1>
             </div>
 
-            <!-- Section des Tableaux de Gestion (GMAO) -->
-            <div class="bg-white rounded-xl shadow p-6 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-semibold text-gray-800">Gestion des Équipements et Interventions</h2>
-                    <div class="space-x-2">
-                        <button onclick="addNewItem()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
-                            + Ajouter un élément
-                        </button>
-                        <button onclick="refreshAll()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm transition">
-                            Actualiser
-                        </button>
+            <!-- Sélecteur de Projet / Société -->
+            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+                <i class="fa-solid fa-building text-amber-400 text-xs"></i>
+                <select id="companySelect" onchange="changeCompany()" class="bg-transparent text-white text-xs font-semibold outline-none cursor-pointer"></select>
+                <button onclick="addNewCompany()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg" title="Ajouter Société"><i class="fa-solid fa-plus"></i></button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="exportDataJSON()" class="bg-slate-800 hover:bg-slate-700 text-xs text-emerald-400 px-3 py-2 rounded-xl border border-slate-700"><i class="fa-solid fa-download mr-1"></i> Sauvegarder</button>
+                <button onclick="document.getElementById('importFileInput').click()" class="bg-slate-800 hover:bg-slate-700 text-xs text-indigo-300 px-3 py-2 rounded-xl border border-slate-700"><i class="fa-solid fa-upload mr-1"></i> Restaurer</button>
+                <input type="file" id="importFileInput" onchange="importDataJSON(event)" class="hidden" accept=".json">
+                <button onclick="handleLogout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-800 gap-2 overflow-x-auto bg-slate-900/50 p-2 rounded-2xl backdrop-blur-md">
+            <button onclick="switchTab('network')" id="tab-network" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-circle-nodes"></i> Vue Globale (Réseau)
+            </button>
+            <button onclick="switchTab('di')" id="tab-di" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list"></i> Demandes d'Intervention (DI)
+            </button>
+            <button onclick="switchTab('planning')" id="tab-planning" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check"></i> Planning & Maintenance Préventive
+            </button>
+            <button onclick="switchTab('pannes')" id="tab-pannes" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i> Journal des Pannes
+            </button>
+            <button onclick="switchTab('structure')" id="tab-structure" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-sitemap"></i> Structure & Équipe
+            </button>
+            <button onclick="switchTab('kpis')" id="tab-kpis" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> Indicateurs KPIs
+            </button>
+            <button onclick="switchTab('stock')" id="tab-stock" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked"></i> Stock & Images Pièces
+            </button>
+            <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice"></i> Rapport Journalier
+            </button>
+        </div>
+
+        <!-- 1. NETWORK -->
+        <section id="sec-network" class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-project-diagram text-indigo-400"></i> Cartographie Industrielle & Maintenance</h2>
+                        <p class="text-xs text-slate-400 mt-1">Vue d'ensemble interactive de l'usine, des plannings et des stocks.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openDiModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus mr-1"></i> Créer DI</button>
+                        <button onclick="openPlanningModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus mr-1"></i> Planifier</button>
                     </div>
                 </div>
+                <div class="w-full h-[450px] bg-slate-950 border border-slate-800/80 rounded-2xl relative flex items-center justify-center p-4 overflow-hidden">
+                    <div id="networkNodesContainer" class="relative w-full h-full flex items-center justify-center"></div>
+                </div>
+            </div>
+        </section>
 
-                <!-- جدول البيانات الرئيسي -->
+        <!-- 2. DEMANDES D'INTERVENTION (DI) -->
+        <section id="sec-di" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-base font-bold text-white"><i class="fa-solid fa-clipboard-list text-amber-400 mr-2"></i>Demandes d'Intervention (DI)</h2>
+                    <button onclick="openDiModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-semibold">Nouvelle DI</button>
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID / Code</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Désignation Équipement</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type de Maintenance</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+                            <tr><th class="p-3">Date</th><th class="p-3">Équipement</th><th class="p-3">Description</th><th class="p-3">Priorité</th><th class="p-3">Statut</th><th class="p-3 text-center">Action</th></tr>
                         </thead>
-                        <tbody id="gmaoTableBody" class="bg-white divide-y divide-gray-200">
-                            <!-- سيتم تعبئة البيانات هنا تلقائياً -->
-                        </tbody>
+                        <tbody id="table-di-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
                     </table>
                 </div>
             </div>
+        </section>
 
-        </main>
+        <!-- 3. PLANNING PRÉVENTIF -->
+        <section id="sec-planning" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-base font-bold text-white"><i class="fa-solid fa-calendar-check text-indigo-400 mr-2"></i>Planning de Maintenance Préventive</h2>
+                    <button onclick="openPlanningModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold">Planifier une tâche</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+                            <tr><th class="p-3">Date Prévue</th><th class="p-3">Équipement</th><th class="p-3">Tâche / Opération</th><th class="p-3">Fréquence</th><th class="p-3">Technicien Assigné</th><th class="p-3">Statut</th><th class="p-3 text-center">Action</th></tr>
+                        </thead>
+                        <tbody id="table-planning-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. PANNES -->
+        <section id="sec-pannes" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-base font-bold text-white">Journal des Pannes & Consommation de Pièces</h2>
+                    <button onclick="openPanneModal()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-semibold">Déclarer Panne</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+                            <tr><th class="p-3">Date</th><th class="p-3">Équipement</th><th class="p-3">Sous-Éq</th><th class="p-3">Symptôme</th><th class="p-3">Pièce Utilisée</th><th class="p-3">Arrêt (h)</th><th class="p-3">Technicien</th><th class="p-3 text-center">Action</th></tr>
+                        </thead>
+                        <tbody id="table-pannes-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. STRUCTURE -->
+        <section id="sec-structure" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2"><h3 class="font-bold text-xs text-white">Zones</h3><button onclick="openZoneModal()" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">+</button></div>
+                    <ul id="list-zones" class="space-y-1 text-xs text-slate-300"></ul>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2"><h3 class="font-bold text-xs text-white">Équipements</h3><button onclick="openEquipementModal()" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">+</button></div>
+                    <ul id="list-equipements" class="space-y-1 text-xs text-slate-300"></ul>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2"><h3 class="font-bold text-xs text-white">Sous-Équipements</h3><button onclick="openSousEquipementModal()" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">+</button></div>
+                    <ul id="list-sousequipements" class="space-y-1 text-xs text-slate-300"></ul>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2"><h3 class="font-bold text-xs text-white">Techniciens</h3><button onclick="openTechModal()" class="bg-purple-600 text-white px-2 py-1 rounded text-xs">+</button></div>
+                    <ul id="list-techs" class="space-y-1 text-xs text-slate-300"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. KPIS -->
+        <section id="sec-kpis" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl"><div class="text-[10px] font-bold text-slate-400 uppercase">MTBF</div><div class="text-2xl font-extrabold text-indigo-400 mt-1" id="kpiMtbf">-- hrs</div></div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl"><div class="text-[10px] font-bold text-slate-400 uppercase">MTTR</div><div class="text-2xl font-extrabold text-amber-400 mt-1" id="kpiMttr">-- hrs</div></div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl"><div class="text-[10px] font-bold text-slate-400 uppercase">Disponibilité</div><div class="text-2xl font-extrabold text-emerald-400 mt-1" id="kpiDisp">-- %</div></div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl"><div class="text-[10px] font-bold text-slate-400 uppercase">Total Arrêt</div><div class="text-2xl font-extrabold text-red-400 mt-1" id="kpiTotalDowntime">-- hrs</div></div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl"><h3 class="font-bold text-white mb-4 text-sm">Temps d'arrêt par Équipement (h)</h3><div class="h-64"><canvas id="kpiChart"></canvas></div></div>
+        </section>
+
+        <!-- 7. STOCK & IMAGES -->
+        <section id="sec-stock" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center"><h2 class="text-base font-bold text-white"><i class="fa-solid fa-boxes-stacked text-emerald-400 mr-2"></i>Gestion du Stock & Images des Pièces</h2><button onclick="openStockModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold">Ajouter Pièce</button></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800"><tr><th class="p-3">Image</th><th class="p-3">Référence</th><th class="p-3">Désignation</th><th class="p-3">Emplacement</th><th class="p-3">Quantité</th><th class="p-3">Seuil Min</th><th class="p-3">Statut</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="table-stock-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody></table></div>
+            </div>
+        </section>
+
+        <!-- 8. REPORTS -->
+        <section id="sec-reports" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h2 class="text-base font-bold text-white">Rapport de Maintenance Journalier</h2><button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs"><i class="fa-solid fa-print mr-1"></i> Imprimer / PDF</button></div>
+                <div id="printable-report" class="p-6 bg-white text-slate-900 rounded-xl space-y-4">
+                    <div class="flex justify-between border-b pb-3"><h3 class="text-lg font-bold text-indigo-900" id="reportTitle">RAPPORT DE MAINTENANCE</h3><input type="date" id="reportDate" class="text-xs border rounded p-1"></div>
+                    <textarea id="reportSummary" rows="3" class="w-full border rounded p-2 text-xs">Synthèse des interventions, pannes et état du stock de pièces.</textarea>
+                    <div id="reportDataPreview" class="text-xs space-y-1"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- MODALS -->
+<!-- Modal DI -->
+<div id="modalDi" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+        <h3 class="font-bold text-white text-sm">Nouvelle Demande d'Intervention (DI)</h3>
+        <form onsubmit="saveDiItem(event)" class="space-y-3">
+            <input type="date" id="diDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+            <select id="diMachineSelect" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></select>
+            <textarea id="diDesc" required placeholder="Description de la demande..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" rows="2"></textarea>
+            <select id="diPriority" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                <option value="Haute">Priorité Haute</option>
+                <option value="Moyenne" selected>Priorité Moyenne</option>
+                <option value="Basse">Priorité Basse</option>
+            </select>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeDiModal()" class="text-xs text-slate-400">Annuler</button><button type="submit" class="bg-amber-600 text-white px-4 py-1.5 rounded-xl text-xs font-semibold">Enregistrer</button></div>
+        </form>
     </div>
+</div>
 
-    <!-- ================= SCRIPTS ET LOGIQUE DU SYSTÈME ================= -->
-    <script>
-        // التحقق عند فتح الصفحة
-        window.addEventListener('DOMContentLoaded', () => {
-            const localAuth = localStorage.getItem('gmao_logged');
-            if (localAuth === 'true') {
-                openApp();
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('hidden');
-            }
+<!-- Modal Planning -->
+<div id="modalPlanning" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+        <h3 class="font-bold text-white text-sm">Planifier Maintenance Préventive</h3>
+        <form onsubmit="savePlanningItem(event)" class="space-y-3">
+            <input type="date" id="plDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+            <select id="plMachineSelect" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></select>
+            <input type="text" id="plTask" required placeholder="Tâche (ex: Graissage roulements, Contrôle...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+            <select id="plFreq" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                <option value="Hebdomadaire">Hebdomadaire</option>
+                <option value="Mensuel" selected>Mensuel</option>
+                <option value="Trimestriel">Trimestriel</option>
+            </select>
+            <select id="plTechSelect" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></select>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closePlanningModal()" class="text-xs text-slate-400">Annuler</button><button type="submit" class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl text-xs font-semibold">Planifier</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Panne -->
+<div id="modalPanne" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+        <h3 class="font-bold text-white text-sm">Déclarer une Panne & Pièces</h3>
+        <form onsubmit="savePanneItem(event)" class="space-y-3">
+            <input type="date" id="pnDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+            <select id="pnMachineSelect" onchange="updateSubEqDropdown()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></select>
+            <select id="pnSubEqSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></select>
+            <textarea id="pnDesc" required placeholder="Symptôme / Cause..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" rows="2"></textarea>
+            <select id="pnStockSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"><option value="">-- Pièce de rechange utilisée (Optionnel) --</option></select>
+            <select id="pnTechSelect" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></select>
+            <input type="number" id="pnHours" step="0.5" min="0.5" value="1" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Durée d'arrêt (h)">
+            <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closePanneModal()" class="text-xs text-slate-400">Annuler</button><button type="submit" class="bg-red-600 text-white px-4 py-1.5 rounded-xl text-xs font-semibold">Enregistrer</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Modals Structure & Stock -->
+<div id="modalZone" class="fixed inset-0 bg-slate-950/80 hidden z-50 flex justify-center items-center p-4"><div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm space-y-3"><h3 class="font-bold text-white text-xs">Ajouter Zone</h3><input type="text" id="znName" placeholder="Nom de la zone" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"><div class="flex justify-end gap-2"><button onclick="closeZoneModal()" class="text-xs text-slate-400">Annuler</button><button onclick="saveZone()" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs">Ajouter</button></div></div></div>
+<div id="modalEquipement" class="fixed inset-0 bg-slate-950/80 hidden z-50 flex justify-center items-center p-4"><div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm space-y-3"><h3 class="font-bold text-white text-xs">Ajouter Équipement</h3><select id="eqZoneSelect" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"></select><input type="text" id="eqCode" placeholder="Code (EQ-01)" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"><input type="text" id="eqName" placeholder="Nom" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"><div class="flex justify-end gap-2"><button onclick="closeEquipementModal()" class="text-xs text-slate-400">Annuler</button><button onclick="saveEquipement()" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs">Ajouter</button></div></div></div>
+<div id="modalSousEquipement" class="fixed inset-0 bg-slate-950/80 hidden z-50 flex justify-center items-center p-4"><div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm space-y-3"><h3 class="font-bold text-white text-xs">Ajouter Sous-Équipement</h3><select id="subEqParentSelect" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"></select><input type="text" id="subEqName" placeholder="Nom" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"><div class="flex justify-end gap-2"><button onclick="closeSousEquipementModal()" class="text-xs text-slate-400">Annuler</button><button onclick="saveSousEquipement()" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs">Ajouter</button></div></div></div>
+<div id="modalTech" class="fixed inset-0 bg-slate-950/80 hidden z-50 flex justify-center items-center p-4"><div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm space-y-3"><h3 class="font-bold text-white text-xs">Ajouter Technicien</h3><input type="text" id="techName" placeholder="Nom complet" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"><input type="text" id="techSpec" placeholder="Spécialité" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded"><div class="flex justify-end gap-2"><button onclick="closeTechModal()" class="text-xs text-slate-400">Annuler</button><button onclick="saveTech()" class="bg-purple-600 text-white px-3 py-1 rounded text-xs">Ajouter</button></div></div></div>
+
+<!-- Modal Stock avec Image -->
+<div id="modalStock" class="fixed inset-0 bg-slate-950/80 hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md space-y-3">
+        <h3 class="font-bold text-white text-xs">Ajouter / Modifier Pièce de Rechange</h3>
+        <input type="text" id="stRef" placeholder="Référence (ex: SKF-6204)" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded">
+        <input type="text" id="stName" placeholder="Désignation" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded">
+        <input type="text" id="stLoc" placeholder="Emplacement" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded">
+        <input type="text" id="stImage" placeholder="Lien de l'image (URL de la photo)" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded">
+        <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="stQty" placeholder="Quantité" value="10" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded">
+            <input type="number" id="stMin" placeholder="Seuil Min" value="2" class="w-full bg-slate-950 border border-slate-800 p-2 text-xs text-white rounded">
+        </div>
+        <div class="flex justify-end gap-2"><button onclick="closeStockModal()" class="text-xs text-slate-400">Annuler</button><button onclick="saveStock()" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs">Enregistrer</button></div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'GMAO_PRO_FR_DB';
+    let defaultDB = {
+        'Projet_A': {
+            name: 'Société A - Usine Principale',
+            zones: ['Zone Extrusion', 'Zone Assemblage'],
+            equipements: [{ code: 'EQ-01', name: 'Presse Hydraulique 01', zone: 'Zone Extrusion' }],
+            subEquipements: [{ name: 'Vérin Principal', parent: 'EQ-01' }],
+            techniciens: [{ name: 'Abdelali Bouzid', spec: 'Électromécanique' }],
+            di: [],
+            planning: [],
+            pannes: [],
+            stock: [{ ref: 'SKF-6204', name: 'Roulement à billes', loc: 'Rayon A1', image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=100', qty: 5, min: 2 }]
+        }
+    };
+
+    let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultDB;
+    let currentCompany = Object.keys(db)[0] || 'Projet_A';
+    let myChart = null;
+
+    function saveToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        updateCompanyDropdown();
+        refreshAll();
+    }
+
+    function handleLogout() {
+        document.getElementById('app-screen').classList.add('hidden');
+        document.getElementById('auth-screen').classList.remove('hidden');
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20');
+            btn.classList.add('text-slate-400');
         });
+        const activeBtn = document.getElementById(`tab-${tabId}`);
+        activeBtn.classList.add('text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20');
+        activeBtn.classList.remove('text-slate-400');
+        if(tabId === 'network') renderNeuralNetwork();
+    }
 
-        // دالة تسجيل الدخول
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            const errorDiv = document.getElementById('loginError');
+    function updateCompanyDropdown() {
+        const sel = document.getElementById('companySelect');
+        sel.innerHTML = Object.keys(db).map(k => `<option value="${k}">${db[k].name}</option>`).join('');
+        sel.value = currentCompany;
+    }
 
-            if (email !== "abdelali.bouzid.98@gmail.com") {
-                errorDiv.innerText = "Accès refusé : Cet e-mail n'est pas autorisé.";
-                errorDiv.classList.remove('hidden');
-                return;
-            }
+    function changeCompany() { currentCompany = document.getElementById('companySelect').value; refreshAll(); }
 
-            if (password === "abdelali@98") {
-                errorDiv.classList.add('hidden');
-                localStorage.setItem('gmao_logged', 'true');
-                openApp();
-            } else {
-                errorDiv.innerText = "Mot de passe incorrect.";
-                errorDiv.classList.remove('hidden');
-            }
+    function addNewCompany() {
+        const name = prompt("Nom de la nouvelle société / projet :");
+        if(name) {
+            const key = 'Proj_' + Date.now();
+            db[key] = { name, zones: [], equipements: [], subEquipements: [], techniciens: [], di: [], planning: [], pannes: [], stock: [] };
+            currentCompany = key; saveToStorage(); updateCompanyDropdown(); refreshAll();
         }
+    }
 
-        // فتح واجهة التطبيق واسترجاع المعطيات
-        function openApp() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            refreshAll();
+    function refreshAll() {
+        renderNeuralNetwork();
+        renderDiTable();
+        renderPlanningTable();
+        renderPannesTable();
+        renderStructureLists();
+        renderStockTable();
+        calculateKPIs();
+    }
+
+    // --- Réseau / Dashboard Visuel ---
+    function renderNeuralNetwork() {
+        const container = document.getElementById('networkNodesContainer');
+        const proj = db[currentCompany];
+        
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center space-y-6 w-full h-full relative z-10">
+                <div class="node-circle w-28 h-28 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex flex-col items-center justify-center shadow-lg shadow-indigo-500/30 text-center p-2 border-2 border-indigo-400">
+                    <i class="fa-solid fa-building text-white text-lg mb-1"></i>
+                    <span class="text-[10px] font-bold text-white truncate w-full">${proj.name}</span>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-3 w-full max-w-4xl mt-2">
+                    <div onclick="switchTab('di')" class="node-circle bg-slate-900/90 border border-amber-500/30 p-3 rounded-2xl text-center shadow-md">
+                        <i class="fa-solid fa-clipboard-list text-amber-400 text-sm mb-1"></i>
+                        <div class="text-xs font-bold text-white">${proj.di?.length || 0} DI</div>
+                        <div class="text-[9px] text-slate-400">Demandes</div>
+                    </div>
+                    <div onclick="switchTab('planning')" class="node-circle bg-slate-900/90 border border-indigo-500/30 p-3 rounded-2xl text-center shadow-md">
+                        <i class="fa-solid fa-calendar-check text-indigo-400 text-sm mb-1"></i>
+                        <div class="text-xs font-bold text-white">${proj.planning?.length || 0} Prév.</div>
+                        <div class="text-[9px] text-slate-400">Planning</div>
+                    </div>
+                    <div onclick="switchTab('structure')" class="node-circle bg-slate-900/90 border border-blue-500/30 p-3 rounded-2xl text-center shadow-md">
+                        <i class="fa-solid fa-plug text-blue-400 text-sm mb-1"></i>
+                        <div class="text-xs font-bold text-white">${proj.equipements.length} Éq.</div>
+                        <div class="text-[9px] text-slate-400">Équipements</div>
+                    </div>
+                    <div onclick="switchTab('pannes')" class="node-circle bg-slate-900/90 border border-red-500/30 p-3 rounded-2xl text-center shadow-md">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 text-sm mb-1"></i>
+                        <div class="text-xs font-bold text-white">${proj.pannes.length} Pannes</div>
+                        <div class="text-[9px] text-slate-400">Historique</div>
+                    </div>
+                    <div onclick="switchTab('stock')" class="node-circle bg-slate-900/90 border border-emerald-500/30 p-3 rounded-2xl text-center shadow-md">
+                        <i class="fa-solid fa-boxes-stacked text-emerald-400 text-sm mb-1"></i>
+                        <div class="text-xs font-bold text-white">${proj.stock.length} Pièces</div>
+                        <div class="text-[9px] text-slate-400">Stock & Images</div>
+                    </div>
+                    <div onclick="switchTab('structure')" class="node-circle bg-slate-900/90 border border-purple-500/30 p-3 rounded-2xl text-center shadow-md">
+                        <i class="fa-solid fa-users text-purple-400 text-sm mb-1"></i>
+                        <div class="text-xs font-bold text-white">${proj.techniciens.length} Techs</div>
+                        <div class="text-[9px] text-slate-400">Équipe</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- DI ---
+    function openDiModal() {
+        document.getElementById('diDate').valueAsDate = new Date();
+        document.getElementById('diMachineSelect').innerHTML = db[currentCompany].equipements.map(e=>`<option value="${e.code}">${e.code} - ${e.name}</option>`).join('');
+        document.getElementById('modalDi').classList.remove('hidden');
+    }
+    function closeDiModal() { document.getElementById('modalDi').classList.add('hidden'); }
+    function saveDiItem(e) {
+        e.preventDefault();
+        if(!db[currentCompany].di) db[currentCompany].di = [];
+        db[currentCompany].di.push({
+            date: document.getElementById('diDate').value,
+            machine: document.getElementById('diMachineSelect').value,
+            desc: document.getElementById('diDesc').value,
+            priority: document.getElementById('diPriority').value,
+            status: 'En attente'
+        });
+        saveToStorage(); closeDiModal(); refreshAll();
+    }
+    function renderDiTable() {
+        const diList = db[currentCompany].di || [];
+        document.getElementById('table-di-body').innerHTML = diList.map((d, i)=>`
+            <tr>
+                <td class="p-3">${d.date}</td>
+                <td class="p-3 font-bold">${d.machine}</td>
+                <td class="p-3">${d.desc}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${d.priority==='Haute'?'bg-red-500/20 text-red-400':'bg-amber-500/20 text-amber-400'}">${d.priority}</span></td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300">${d.status}</span></td>
+                <td class="p-3 text-center"><button onclick="db['${currentCompany}'].di.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400">Supprimer</button></td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Planning Préventif ---
+    function openPlanningModal() {
+        document.getElementById('plDate').valueAsDate = new Date();
+        document.getElementById('plMachineSelect').innerHTML = db[currentCompany].equipements.map(e=>`<option value="${e.code}">${e.code} - ${e.name}</option>`).join('');
+        document.getElementById('plTechSelect').innerHTML = db[currentCompany].techniciens.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+        document.getElementById('modalPlanning').classList.remove('hidden');
+    }
+    function closePlanningModal() { document.getElementById('modalPlanning').classList.add('hidden'); }
+    function savePlanningItem(e) {
+        e.preventDefault();
+        if(!db[currentCompany].planning) db[currentCompany].planning = [];
+        db[currentCompany].planning.push({
+            date: document.getElementById('plDate').value,
+            machine: document.getElementById('plMachineSelect').value,
+            task: document.getElementById('plTask').value,
+            freq: document.getElementById('plFreq').value,
+            tech: document.getElementById('plTechSelect').value,
+            status: 'Planifié'
+        });
+        saveToStorage(); closePlanningModal(); refreshAll();
+    }
+    function renderPlanningTable() {
+        const plList = db[currentCompany].planning || [];
+        document.getElementById('table-planning-body').innerHTML = plList.map((p, i)=>`
+            <tr>
+                <td class="p-3">${p.date}</td>
+                <td class="p-3 font-bold">${p.machine}</td>
+                <td class="p-3">${p.task}</td>
+                <td class="p-3 text-indigo-300">${p.freq}</td>
+                <td class="p-3 text-purple-400">${p.tech}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">${p.status}</span></td>
+                <td class="p-3 text-center"><button onclick="db['${currentCompany}'].planning.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400">Supprimer</button></td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Structure & Pannes ---
+    function renderStructureLists() {
+        const proj = db[currentCompany];
+        document.getElementById('list-zones').innerHTML = proj.zones.map((z, i)=>`<li class="flex justify-between items-center py-1"><span>${z}</span><button onclick="db['${currentCompany}'].zones.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400 text-[10px]">Suppr</button></li>`).join('');
+        document.getElementById('list-equipements').innerHTML = proj.equipements.map((e, i)=>`<li class="flex justify-between items-center py-1"><span><b>${e.code}</b></span><button onclick="db['${currentCompany}'].equipements.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400 text-[10px]">Suppr</button></li>`).join('');
+        document.getElementById('list-sousequipements').innerHTML = proj.subEquipements.map((s, i)=>`<li class="flex justify-between items-center py-1"><span>${s.name}</span><button onclick="db['${currentCompany}'].subEquipements.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400 text-[10px]">Suppr</button></li>`).join('');
+        document.getElementById('list-techs').innerHTML = proj.techniciens.map((t, i)=>`<li class="flex justify-between items-center py-1"><span>${t.name}</span><button onclick="db['${currentCompany}'].techniciens.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400 text-[10px]">Suppr</button></li>`).join('');
+    }
+
+    function openZoneModal() { document.getElementById('modalZone').classList.remove('hidden'); }
+    function closeZoneModal() { document.getElementById('modalZone').classList.add('hidden'); }
+    function saveZone() { const v = document.getElementById('znName').value; if(v){ db[currentCompany].zones.push(v); saveToStorage(); closeZoneModal(); refreshAll(); } }
+
+    function openEquipementModal() {
+        document.getElementById('eqZoneSelect').innerHTML = db[currentCompany].zones.map(z=>`<option value="${z}">${z}</option>`).join('');
+        document.getElementById('modalEquipement').classList.remove('hidden');
+    }
+    function closeEquipementModal() { document.getElementById('modalEquipement').classList.add('hidden'); }
+    function saveEquipement() {
+        const code = document.getElementById('eqCode').value, name = document.getElementById('eqName').value, zone = document.getElementById('eqZoneSelect').value;
+        if(code && name) { db[currentCompany].equipements.push({code, name, zone}); saveToStorage(); closeEquipementModal(); refreshAll(); }
+    }
+
+    function openSousEquipementModal() {
+        document.getElementById('subEqParentSelect').innerHTML = db[currentCompany].equipements.map(e=>`<option value="${e.code}">${e.code} - ${e.name}</option>`).join('');
+        document.getElementById('modalSousEquipement').classList.remove('hidden');
+    }
+    function closeSousEquipementModal() { document.getElementById('modalSousEquipement').classList.add('hidden'); }
+    function saveSousEquipement() {
+        const name = document.getElementById('subEqName').value, parent = document.getElementById('subEqParentSelect').value;
+        if(name) { db[currentCompany].subEquipements.push({name, parent}); saveToStorage(); closeSousEquipementModal(); refreshAll(); }
+    }
+
+    function openTechModal() { document.getElementById('modalTech').classList.remove('hidden'); }
+    function closeTechModal() { document.getElementById('modalTech').classList.add('hidden'); }
+    function saveTech() { const name = document.getElementById('techName').value, spec = document.getElementById('techSpec').value; if(name){ db[currentCompany].techniciens.push({name, spec}); saveToStorage(); closeTechModal(); refreshAll(); } }
+
+    function openPanneModal() {
+        document.getElementById('pnDate').valueAsDate = new Date();
+        document.getElementById('pnMachineSelect').innerHTML = db[currentCompany].equipements.map(e=>`<option value="${e.code}">${e.code} - ${e.name}</option>`).join('');
+        document.getElementById('pnTechSelect').innerHTML = db[currentCompany].techniciens.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+        document.getElementById('pnStockSelect').innerHTML = `<option value="">-- Aucune pièce --</option>` + db[currentCompany].stock.map(s=>`<option value="${s.ref}">${s.name} (${s.ref})</option>`).join('');
+        updateSubEqDropdown();
+        document.getElementById('modalPanne').classList.remove('hidden');
+    }
+    function updateSubEqDropdown() {
+        const code = document.getElementById('pnMachineSelect').value;
+        const subs = db[currentCompany].subEquipements.filter(s=>s.parent === code);
+        document.getElementById('pnSubEqSelect').innerHTML = subs.map(s=>`<option value="${s.name}">${s.name}</option>`).join('');
+    }
+    function closePanneModal() { document.getElementById('modalPanne').classList.add('hidden'); }
+    function savePanneItem(e) {
+        e.preventDefault();
+        const refPart = document.getElementById('pnStockSelect').value;
+        if(refPart) {
+            const st = db[currentCompany].stock.find(s=>s.ref === refPart);
+            if(st && st.qty > 0) st.qty -= 1; // خصم تلقائي من المخزون
         }
+        db[currentCompany].pannes.push({
+            date: document.getElementById('pnDate').value,
+            machine: document.getElementById('pnMachineSelect').value,
+            subEq: document.getElementById('pnSubEqSelect').value,
+            desc: document.getElementById('pnDesc').value,
+            part: refPart || '-',
+            tech: document.getElementById('pnTechSelect').value,
+            hours: parseFloat(document.getElementById('pnHours').value)
+        });
+        saveToStorage(); closePanneModal(); refreshAll();
+    }
+    function renderPannesTable() {
+        const p = db[currentCompany].pannes;
+        document.getElementById('table-pannes-body').innerHTML = p.map((pn, i)=>`<tr><td class="p-3">${pn.date}</td><td class="p-3 font-bold">${pn.machine}</td><td class="p-3">${pn.subEq||'-'}</td><td class="p-3">${pn.desc}</td><td class="p-3 text-emerald-400 font-semibold">${pn.part}</td><td class="p-3 text-red-400 font-bold">${pn.hours}h</td><td class="p-3 text-purple-400">${pn.tech}</td><td class="p-3 text-center"><button onclick="db['${currentCompany}'].pannes.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400">Suppr</button></td></tr>`).join('');
+    }
 
-        // تسجيل الخروج
-        function handleLogout() {
-            localStorage.removeItem('gmao_logged');
-            document.getElementById('app-screen').classList.add('hidden');
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('loginPassword').value = '';
+    // --- Stock & Images ---
+    function openStockModal() { document.getElementById('modalStock').classList.remove('hidden'); }
+    function closeStockModal() { document.getElementById('modalStock').classList.add('hidden'); }
+    function saveStock() {
+        db[currentCompany].stock.push({ 
+            ref: document.getElementById('stRef').value, 
+            name: document.getElementById('stName').value, 
+            loc: document.getElementById('stLoc').value, 
+            image: document.getElementById('stImage').value || 'https://via.placeholder.com/100',
+            qty: parseInt(document.getElementById('stQty').value), 
+            min: parseInt(document.getElementById('stMin').value) 
+        });
+        saveToStorage(); closeStockModal(); refreshAll();
+    }
+    function renderStockTable() {
+        document.getElementById('table-stock-body').innerHTML = db[currentCompany].stock.map((s, i)=>`
+            <tr>
+                <td class="p-3"><img src="${s.image}" alt="Pièce" class="w-10 h-10 object-cover rounded-lg border border-slate-700"></td>
+                <td class="p-3 font-bold">${s.ref}</td>
+                <td class="p-3">${s.name}</td>
+                <td class="p-3">${s.loc}</td>
+                <td class="p-3 font-bold">${s.qty}</td>
+                <td class="p-3 text-slate-400">${s.min}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.qty<=s.min?'bg-red-500/20 text-red-400':'bg-emerald-500/20 text-emerald-400'}">${s.qty<=s.min?'Alerte Stock':'Normal'}</span></td>
+                <td class="p-3 text-center"><button onclick="db['${currentCompany}'].stock.splice(${i},1);saveToStorage();refreshAll();" class="text-red-400">Suppr</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function calculateKPIs() {
+        const pannes = db[currentCompany].pannes;
+        const total = pannes.reduce((s,p)=>s+p.hours,0);
+        const count = pannes.length;
+        const mttr = count>0?(total/count).toFixed(1):0;
+        const mtbf = count>0?((500-total)/count).toFixed(1):500;
+        const disp = (((500-total)/500)*100).toFixed(1);
+        document.getElementById('kpiMtbf').innerText = mtbf + ' hrs';
+        document.getElementById('kpiMttr').innerText = mttr + ' hrs';
+        document.getElementById('kpiDisp').innerText = disp + ' %';
+        document.getElementById('kpiTotalDowntime').innerText = total + ' hrs';
+
+        const ctx = document.getElementById('kpiChart')?.getContext('2d');
+        if(ctx) {
+            const map={}; pannes.forEach(p=>map[p.machine]=(map[p.machine]||0)+p.hours);
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(map), datasets: [{ label: "Temps d'arrêt (h)", data: Object.values(map), backgroundColor: '#6366f1' }] }, options: { responsive: true, maintainAspectRatio: false } });
         }
+    }
 
-        // تحديث وعرض البيانات (الجداول والإحصائيات)
-        function refreshAll() {
-            // بيانات تجريبية افتراضية للمتابعة (يمكنك ربطها لاحقاً بقاعدة بياناتك السابقة)
-            const sampleData = [
-                { id: "EQ-001", name: "Ligne d'embouteillage - Moteur Principal", type: "Préventive", status: "Opérationnel" },
-                { id: "EQ-002", name: "Compresseur d'air Atlas Copco", type: "Curative", status: "En attente de pièces" },
-                { id: "EQ-003", name: "Tapis transporteur N°3", type: "Améliorative", status: "En maintenance" }
-            ];
-
-            const tbody = document.getElementById('gmaoTableBody');
-            tbody.innerHTML = '';
-
-            sampleData.forEach(item => {
-                let statusColor = item.status === 'Opérationnel' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.type}</td>
-                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">${item.status}</span></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <button onclick="alert('Détails de l\'équipement ${item.id}')" class="text-blue-600 hover:text-blue-900">Consulter</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            // تحديث الإحصائيات
-            document.getElementById('stat-pending').innerText = "2";
-            document.getElementById('stat-equipments').innerText = "14";
-            document.getElementById('stat-stock').innerText = "48";
-        }
-
-        function addNewItem() {
-            alert("Fonctionnalité d'ajout d'un nouvel équipement ou intervention.");
-        }
-    </script>
+    function exportDataJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `GMAO_Pro_Backup.json`);
+        document.body.appendChild(dl); dl.click(); dl.remove();
+    }
+    function importDataJSON(e) {
+        const fr = new FileReader();
+        fr.onload = function(evt) { db = JSON.parse(evt.target.result); currentCompany = Object.keys(db)[0]; saveToStorage(); updateCompanyDropdown(); refreshAll(); alert("Données importées avec succès !"); };
+        if(e.target.files[0]) fr.readAsText(e.target.files[0]);
+    }
+</script>
 </body>
 </html>
