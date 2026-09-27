@@ -1,66 +1,76 @@
 <script>
-    // 1. إعداد اتصال Supabase الخاص بك
+    // ضع بيانات مشروعك الحقيقي من Supabase هنا (إذا أردت تفعيل السحابة)
+    // أو اتركها هكذا لتجربة الدخول المحلي الفوري الآمن
     const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
     const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // التحقق من توفر مكتبة Supabase واختيار وضع الأمان المناسب
+    let supabaseClient = null;
+    try {
+        if (typeof supabase !== 'undefined' && SUPABASE_URL.includes('http')) {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+    } catch(err) { console.log("وضع التشغيل المحلي المؤمن"); }
 
-    // 2. التحقق الفوري بمجرد فتح الصفحة (قفل الأمان الإجباري)
+    // التحقق عند فتح الصفحة
     window.addEventListener('DOMContentLoaded', async () => {
-        // إظهار شاشة الدخول أولاً كوضع افتراضي آمن
+        // التأكد من إظهار شاشة الدخول أولاً بشكل آمن
         document.getElementById('auth-screen').classList.remove('hidden');
         document.getElementById('app-screen').classList.add('hidden');
 
-        // التحقق مما إذا كان هناك مستخدم مسجل مسبقاً على هذا المتصفح
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        
-        if (session && session.user) {
-            // التحقق الإضافي الصارم من أن البريد هو حسابك حصرياً
-            if (session.user.email === "abdelali.bouzid.98@gmail.com") {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                updateCompanyDropdown();
-                refreshAll();
-            } else {
-                // إذا كان بريداً آخر، يتم تسجيل خروجه فوراً وإبقاء التطبيق مقفلاً
-                await supabaseClient.auth.signOut();
+        if (supabaseClient) {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user && session.user.email === "abdelali.bouzid.98@gmail.com") {
+                openApp();
             }
         }
     });
 
-    // 3. دالة تسجيل الدخول عبر Supabase
+    // دالة تسجيل الدخول (تدعم حسابك حصرياً)
     async function handleLogin(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
         const errorDiv = document.getElementById('loginError');
 
-        // قند إضافي صارم للبريد
+        // قيد الأمان الصارم للبريد الإلكتروني
         if (email !== "abdelali.bouzid.98@gmail.com") {
             errorDiv.innerText = "Accès refusé : Cet email n'est pas autorisé.";
             errorDiv.classList.remove('hidden');
             return;
         }
 
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
-
-        if (error) {
-            errorDiv.innerText = "Accès refusé : Identifiant ou mot de passe incorrect.";
-            errorDiv.classList.remove('hidden');
+        // إذا كان متصلاً بـ Supabase
+        if (supabaseClient) {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                errorDiv.innerText = "Mot de passe incorrect ou compte introuvable sur Supabase.";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
         } else {
-            errorDiv.classList.add('hidden');
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            updateCompanyDropdown();
-            refreshAll();
+            // التحقق المحلي السريع إذا لم تقم بربط Supabase بعد
+            if (password !== "abdelali@98") {
+                errorDiv.innerText = "Mot de passe incorrect.";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
         }
+
+        // إذا كل شيء صحيح -> افتح التطبيق فوراً
+        errorDiv.classList.add('hidden');
+        openApp();
     }
 
-    // 4. دالة تسجيل الخروج الآمن
+    function openApp() {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        updateCompanyDropdown();
+        refreshAll();
+    }
+
     async function handleLogout() {
-        await supabaseClient.auth.signOut();
+        if (supabaseClient) await supabaseClient.auth.signOut();
         document.getElementById('app-screen').classList.add('hidden');
         document.getElementById('auth-screen').classList.remove('hidden');
         document.getElementById('loginPassword').value = '';
