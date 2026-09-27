@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Système de Gestion de Maintenance Assistée par Ordinateur (GMAO)</title>
-    <!-- Tailwind CSS pour un design moderne et professionnel -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Bibliothèque Supabase -->
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
-    <!-- ================= 1. ÉCRAN DE CONNEXION (SÉCURISÉ) ================= -->
+    <!-- ================= 1. ÉCRAN DE CONNEXION ================= -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-gray-900 px-4">
         <div class="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 space-y-6">
             <div class="text-center">
@@ -24,7 +24,7 @@
                     <label class="block text-sm font-medium text-gray-700">Adresse E-mail</label>
                     <input type="email" id="loginEmail" required 
                         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                        placeholder="abdelali.bouzid.98@gmail.com">
+                        value="abdelali.bouzid.98@gmail.com">
                 </div>
 
                 <div>
@@ -44,15 +44,13 @@
         </div>
     </div>
 
-    <!-- ================= 2. ÉCRAN PRINCIPAL DE L'APPLICATION (PROTÉGÉ) ================= -->
+    <!-- ================= 2. ÉCRAN PRINCIPAL ================= -->
     <div id="app-screen" class="hidden min-h-screen flex flex-col">
-        <!-- Barre de navigation -->
         <header class="bg-blue-900 text-white shadow-md">
             <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
                 <div class="flex items-center space-x-4">
                     <span class="text-xl font-bold">GMAO - Maintenance</span>
                     <select id="companyDropdown" class="bg-blue-800 text-white text-sm px-3 py-1 rounded border border-blue-700">
-                        <!-- Options générées dynamiquement -->
                     </select>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -65,75 +63,62 @@
             </div>
         </header>
 
-        <!-- Contenu principal -->
         <main class="flex-grow max-w-7xl w-full mx-auto p-6 space-y-6">
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Tableau de bord de maintenance</h2>
-                <p class="text-gray-600">Bienvenue dans votre système de gestion. Toutes les fonctionnalités de maintenance et de suivi des équipements sont opérationnelles.</p>
+                <p class="text-gray-600">Bienvenue dans votre système de gestion. Toutes les fonctionnalités sont opérationnelles.</p>
             </div>
         </main>
     </div>
 
-    <!-- ================= SCRIPT DE SÉCURITÉ ET LOGIQUE ================= -->
+    <!-- ================= SCRIPT ================= -->
     <script>
-        // Configuration Supabase (remplacez par vos clés si vous utilisez la base de données cloud)
-        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        // مفاتيح Supabase (اختيارية حالياً لضمان عدم تعطل الصفحة)
+        const SUPABASE_URL = '';
+        const SUPABASE_ANON_KEY = '';
         
         let supabaseClient = null;
         try {
-            if (typeof supabase !== 'undefined' && SUPABASE_URL.includes('http')) {
+            if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
-        } catch(err) { 
-            console.log("Mode de sécurité local activé"); 
-        }
+        } catch(err) { console.log("Mode local actif"); }
 
-        // Vérification automatique au chargement de la page
+        // التحقق عند فتح الصفحة (البقاء في شاشة الدخول إذا لم يتم تسجيل الدخول مسبقاً)
         window.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('app-screen').classList.add('hidden');
-
-            if (supabaseClient) {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (session && session.user && session.user.email === "abdelali.bouzid.98@gmail.com") {
-                    openApp();
-                }
+            // التحقق من وجود جلسة محلية سابقة محفوظة في المتصفح
+            const localAuth = localStorage.getItem('gmao_logged');
+            if (localAuth === 'true') {
+                openApp();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
             }
         });
 
-        // Gestion de la connexion
+        // دالة تسجيل الدخول (مع حماية البريد وكلمة المرور)
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             const errorDiv = document.getElementById('loginError');
 
-            // Restriction stricte de l'e-mail autorisé
+            // قيد البريد الإلكتروني الصارم
             if (email !== "abdelali.bouzid.98@gmail.com") {
                 errorDiv.innerText = "Accès refusé : Cet e-mail n'est pas autorisé.";
                 errorDiv.classList.remove('hidden');
                 return;
             }
 
-            if (supabaseClient) {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) {
-                    errorDiv.innerText = "Mot de passe incorrect ou compte introuvable.";
-                    errorDiv.classList.remove('hidden');
-                    return;
-                }
+            // التحقق من كلمة المرور (كلمة المرور الخاصة بك هي abdelali@98)
+            if (password === "abdelali@98") {
+                errorDiv.classList.add('hidden');
+                localStorage.setItem('gmao_logged', 'true'); // حفظ الجلسة لكي لا يطلبها كل مرة
+                openApp();
             } else {
-                // Mot de passe de secours local si Supabase n'est pas encore configuré
-                if (password !== "abdelali@98") {
-                    errorDiv.innerText = "Mot de passe incorrect.";
-                    errorDiv.classList.remove('hidden');
-                    return;
-                }
+                errorDiv.innerText = "Mot de passe incorrect.";
+                errorDiv.classList.remove('hidden');
             }
-
-            errorDiv.classList.add('hidden');
-            openApp();
         }
 
         function openApp() {
@@ -143,8 +128,8 @@
             refreshAll();
         }
 
-        async function handleLogout() {
-            if (supabaseClient) await supabaseClient.auth.signOut();
+        function handleLogout() {
+            localStorage.removeItem('gmao_logged'); // مسح الجلسة عند الخروج
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('loginPassword').value = '';
@@ -156,7 +141,7 @@
         }
 
         function refreshAll() {
-            console.log("Système actualisé avec succès.");
+            console.log("Système actualisé.");
         }
     </script>
 </body>
