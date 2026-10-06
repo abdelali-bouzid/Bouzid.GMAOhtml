@@ -1,1616 +1,255 @@
-<!DOCTYPE html>
-<html lang="fr" class="bg-slate-950">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Smart Maintenance Pro - GMAO V16</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<style>
-body{
-    font-family:system-ui,-apple-system,sans-serif
-}
-
-body.has-bg{
-    background-image:
-        linear-gradient(
-            rgba(2,6,23,.75),
-            rgba(2,6,23,.75)
-        ),
-        var(--bg);
-    background-size:cover;
-    background-position:center;
-    background-attachment:fixed
-}
-
-#app .bg-slate-900{
-    background-color:rgba(15,23,42,.85)
-}
-
-.hb{
-    background:#1e293b;
-    border:1px solid #334155;
-    padding:.5rem .75rem;
-    border-radius:.75rem;
-    font-size:.75rem
-}
-
-.hb:hover{
-    background:#334155
-}
-
-#printable{
-    background:#fff
-}
-
-#printable td,
-#printable th,
-#printable h3,
-#printable h4,
-#printable p,
-#printable div{
-    color:#0f172a!important
-}
-
-#printable thead{
-    background:#e2e8f0
-}
-
-@media print{
-    body *{
-        visibility:hidden
-    }
-
-    #printable,
-    #printable *{
-        visibility:visible
-    }
-
-    #printable{
-        position:absolute;
-        left:0;
-        top:0;
-        width:100%
-    }
-}
-</style>
-</head>
-
-<body class="bg-slate-950 text-slate-100 min-h-screen">
-
-<!-- =========================================================
-     AUTHENTIFICATION
-========================================================= -->
-
-<div id="auth"
-     class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm
-            flex items-center justify-center p-4">
-
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl
-                shadow-2xl max-w-md w-full p-8">
-
-        <div class="text-center mb-6">
-
-            <div class="text-4xl mb-2">
-                ⚙️
-            </div>
-
-            <h2 class="text-2xl font-bold">
-                Smart Maintenance Pro
-            </h2>
-
-            <p class="text-xs text-slate-400 mt-1">
-                GMAO • Ordres de travail • KPIs
-            </p>
-
-        </div>
-
-        <form onsubmit="login(event)"
-              class="space-y-4"
-              autocomplete="off">
-
-            <div>
-
-                <label class="block text-xs font-bold
-                              text-slate-400 uppercase mb-1">
-                    Identifiant
-                </label>
-
-                <input
-                    id="lu"
-                    required
-                    class="w-full px-4 py-2.5
-                           bg-slate-950
-                           border border-slate-800
-                           rounded-xl
-                           text-sm text-white
-                           outline-none
-                           focus:ring-2
-                           focus:ring-indigo-500">
-            </div>
+Aucun fichier n’a été sélectionné
+Bibliothèque
 
 
-            <div>
 
-                <label class="block text-xs font-bold
-                              text-slate-400 uppercase mb-1">
-                    Mot de passe
-                </label>
+Rechercher dans la bibliothèque
 
-                <input
-                    id="lp"
-                    type="password"
-                    required
-                    class="w-full px-4 py-2.5
-                           bg-slate-950
-                           border border-slate-800
-                           rounded-xl
-                           text-sm text-white
-                           outline-none
-                           focus:ring-2
-                           focus:ring-indigo-500">
-            </div>
+Nouveau
 
 
-            <div id="cw" class="hidden">
+Recommandés
 
-                <label class="block text-xs font-bold
-                              text-slate-400 uppercase mb-1">
-                    Confirmer le mot de passe
-                </label>
-
-                <input
-                    id="lc"
-                    type="password"
-                    class="w-full px-4 py-2.5
-                           bg-slate-950
-                           border border-slate-800
-                           rounded-xl
-                           text-sm text-white
-                           outline-none
-                           focus:ring-2
-                           focus:ring-indigo-500">
-            </div>
+Favoris
 
+Dossiers
 
-            <p id="am"
-               class="hidden text-xs text-red-400">
-            </p>
+Images
 
+Tout
 
-            <button
-                id="ab"
-                class="w-full bg-indigo-600
-                       hover:bg-indigo-500
-                       text-white
-                       font-semibold
-                       py-3
-                       rounded-xl">
 
-                Se connecter
+index
+Modifié 16:09
 
-            </button>
 
-        </form>
+GMAO_PRO_V16_CORRIGE
+Modifié 16:03
 
-    </div>
-</div>
 
+Fichier markdown(1)
+Modifié 15:57
 
-<!-- =========================================================
-     APPLICATION
-========================================================= -->
 
-<div id="app" class="hidden min-h-screen">
+GMAO_PRO_V16_codes_automatiques
+Modifié 15:50
 
-    <header
-        class="bg-slate-900
-               border-b border-slate-800
-               sticky top-0 z-30">
 
-        <div
-            class="max-w-7xl mx-auto
-                   px-4 py-3
-                   flex justify-between
-                   items-center
-                   flex-wrap gap-3">
+Texte collé(5)
+Modifié 15:48
 
 
-            <h1 class="text-lg font-bold">
+Texte collé(4)
+Modifié 15:47
 
-                🏭 GMAO PRO
 
-                <span
-                    class="text-xs
-                           bg-indigo-600
-                           px-2 py-0.5
-                           rounded-full">
+CV_Abdelali_Bouzid
+Modifié 1 oct.
 
-                    V16
 
-                </span>
+GMAO_PRO_V12_SQL
+Modifié 26 sept.
 
-            </h1>
 
+GMAO_PRO_V12
+Modifié 26 sept.
 
-            <div
-                class="flex items-center gap-2
-                       bg-slate-950
-                       px-3 py-1.5
-                       rounded-xl
-                       border border-slate-800">
 
-                <span>🏢</span>
+DPR_Supabase_V11_1
+Modifié 26 sept.
 
-                <select
-                    id="co"
-                    onchange="cur=this.value;render()"
-                    class="bg-transparent
-                           text-xs
-                           font-semibold
-                           outline-none">
-                </select>
 
-                <button
-                    id="addco"
-                    onclick="addCo()"
-                    class="text-xs
-                           bg-indigo-600
-                           px-2 py-1
-                           rounded-lg">
+GMAO_PRO_V11.1_DPR
+Modifié 26 sept.
 
-                    ＋
 
-                </button>
 
-            </div>
 
 
-            <div
-                class="flex items-center
-                       gap-2
-                       flex-wrap">
+Texte collé(3)
+Modifié 21 sept.
 
-                <span
-                    id="who"
-                    class="text-xs text-slate-400">
-                </span>
 
+Texte collé(2)
+Modifié 21 sept.
 
-                <button
-                    onclick="xlsx()"
-                    class="hb text-emerald-300">
 
-                    📥 Excel
+Fichier markdown
+Modifié 15 sept.
 
-                </button>
 
+GMAO_PRO_V4_Equipment_AutoCode_Photos
+Modifié 15 sept.
 
-                <button
-                    onclick="expJSON()"
-                    class="hb text-emerald-300">
 
-                    💾 Sauvegarde
+Texte collé(1)
+Modifié 15 sept.
 
-                </button>
 
 
-                <button
-                    id="rest"
-                    onclick="$('fi').click()"
-                    class="hb text-indigo-300">
 
-                    📤 Restaurer
 
-                </button>
 
 
-                <input
-                    type="file"
-                    id="fi"
-                    accept=".json"
-                    class="hidden"
-                    onchange="imp(event)">
 
 
-                <button
-                    onclick="$('bgf').click()"
-                    class="hb text-amber-300">
 
-                    🖼️ Arrière-plan
+Bibliothèque
+/
+index.html
 
-                </button>
-
-
-                <button
-                    onclick="resetBg()"
-                    class="hb"
-                    title="Retirer l'image">
-
-                    ✕
-
-                </button>
-
-
-                <input
-                    type="file"
-                    id="bgf"
-                    accept="image/*"
-                    class="hidden"
-                    onchange="setBg(event)">
-
-
-                <button
-                    onclick="myPw()"
-                    class="hb">
-
-                    🔑
-
-                </button>
-
-
-                <button
-                    onclick="logout()"
-                    class="hb text-red-400">
-
-                    ⏻
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </header>
-
-
-    <main
-        class="max-w-7xl mx-auto
-               px-4 py-6
-               space-y-6">
-
-        <div
-            id="tabs"
-            class="flex gap-2
-                   overflow-x-auto
-                   bg-slate-900/60
-                   p-2 rounded-2xl">
-        </div>
-
-
-        <div
-            id="view"
-            class="space-y-6">
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- =========================================================
-     MODAL
-========================================================= -->
-
-<div
-    id="modal"
-    class="hidden
-           fixed inset-0 z-50
-           bg-slate-950/80
-           flex items-center
-           justify-center p-4">
-</div>
-
-
-<script>
-
-/* =========================================================
-   CONFIGURATION GÉNÉRALE
-========================================================= */
-
-const KEY = 'GMAO_PRO_FR_DB';
-const UKEY = 'GMAO_PRO_USERS';
-const BGK = 'GMAO_PRO_BG';
-
-const $ = id =>
-    document.getElementById(id);
-
-const esc = s =>
-    String(s ?? '').replace(
-        /[&<>"']/g,
-        c => ({
-            '&':'&amp;',
-            '<':'&lt;',
-            '>':'&gt;',
-            '"':'&quot;',
-            "'":'&#39;'
-        }[c])
-    );
-
-
-let db;
-let cur;
-let me;
-
-let tab = 'dash';
-
-let diF = 'Tous';
-
-let kp = {
-    from:'',
-    to:'',
-    hours:500
+Partager
+Plus d’actions
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+zones:['Zones',z=>esc(z)],
+equipements:['Équipements',e=>`<b>${esc(e.code)}</b> – ${esc(e.name)} <span class="text-slate-500">(${esc(e.zone||'-')})</span>`],
+subEquipements:['Sous-équipements',s=>`<b>${esc(s.code||'')}</b> ${esc(s.parent)} › ${esc(s.name)}`],
+techniciens:['Techniciens',t=>esc(t.name)+(t.spec?` <span class="text-slate-500">(${esc(t.spec)})</span>`:'')]
 };
+function addS(k){
+let f={
+zones:[{n:'name',l:'Nom de la zone',r:1}],
+equipements:[{n:'zone',l:'Zone',t:'select',o:P().zones},{n:'name',l:'Nom',r:1}],
+subEquipements:[{n:'parent',l:'Équipement',t:'select',o:eqOpts()},{n:'name',l:'Nom',r:1}],
+techniciens:[{n:'name',l:'Nom complet',r:1},{n:'spec',l:'Spécialité'}]
+}[k];
+form('Ajouter',f,d=>{
+if(k==='zones'){if(P().zones.includes(d.name))return'Zone déjà existante.';P().zones.push(d.name)}
+if(k==='equipements'){P().equipements.push({code:nextCode(P().equipements,'EQ'),name:d.name,zone:d.zone})}
+if(k==='subEquipements'){P().subEquipements.push({code:nextCode(P().subEquipements,'SE'),name:d.name,parent:d.parent})}
+if(k==='techniciens'){P().techniciens.push({name:d.name,spec:d.spec})}
+})}
+function viewStruct(){return`<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">${Object.entries(SL).map(([k,[t,fn]])=>`<div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3"><div class="flex justify-between items-center border-b border-slate-800 pb-2"><h3 class="font-bold text-xs">${t}</h3>${isAdmin()?`<button onclick="addS('${k}')" class="bg-indigo-600 px-2 py-1 rounded text-xs">＋</button>`:''}</div><ul class="space-y-1 text-xs text-slate-300">${P()[k].map((x,i)=>`<li class="flex justify-between items-center py-1 gap-2"><span>${fn(x)}</span>${del(`P().${k}.splice(${i},1)`)}</li>`).join('')||'<li class="text-slate-500">Vide</li>'}</ul></div>`).join('')}</div>`}
 
-let chart;
+const okImg=u=>/^(https?:|data:)/.test(u||'');
+function newStock(){form('Ajouter une pièce',[{n:'ref',l:'Référence',r:1},{n:'name',l:'Désignation',r:1},{n:'loc',l:'Emplacement'},{n:'image',l:"Lien de l'image (URL)"},{n:'qty',l:'Quantité',t:'number',v:10,s:1},{n:'min',l:'Seuil minimum',t:'number',v:2,s:1}],d=>{if(P().stock.some(s=>s.ref===d.ref))return'Référence déjà existante.';P().stock.push({...d,qty:+d.qty,min:+d.min})})}
+function entStock(i){form('Entrée de stock',[{n:'q',l:'Quantité reçue',t:'number',v:1,s:1,r:1}],d=>{P().stock[i].qty+=Math.round(+d.q)})}
+function viewStock(){return card('📦 Stock & images des pièces',tbl(['Image','Référence','Désignation','Emplacement','Qté','Seuil','Statut','Actions'],P().stock.map((s,i)=>[
+okImg(s.image)?`<img src="${esc(s.image)}" class="w-10 h-10 object-cover rounded-lg border border-slate-700" onerror="this.replaceWith('📦')">`:'📦',`<b>${esc(s.ref)}</b>`,esc(s.name),esc(s.loc||'-'),`<b>${s.qty}</b>`,s.min,badge(s.qty<=s.min?'Alerte stock':'Normal',s.qty<=s.min?'red':'emerald'),lnk('+ Entrée',`entStock(${i})`,'text-emerald-400')+del(`P().stock.splice(${i},1)`)
+])),isAdmin()?btn('indigo','＋ Ajouter pièce','newStock()'):'')}
 
-let note =
-    'Synthèse des interventions, pannes et état du stock.';
-
-
-const P = () =>
-    db[cur];
-
-
-const isAdmin = () =>
-    me && me.role === 'admin';
-
-
-const today = () =>
-    new Date()
-        .toISOString()
-        .slice(0,10);
-
-
-const days = (a,b) =>
-    Math.max(
-        0,
-        Math.round(
-            (new Date(b)-new Date(a))/864e5
-        )
-    );
-
-
-const save = () =>
-    localStorage.setItem(
-        KEY,
-        JSON.stringify(db)
-    );
-
-
-const inP = d =>
-    (!kp.from || d >= kp.from) &&
-    (!kp.to || d <= kp.to);
-
-
-const I =
-    'bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white block mt-1';
-
-
-/* =========================================================
-   DONNÉES PAR DÉFAUT
-========================================================= */
-
-function defaultDB(){
-
-    return {
-
-        Projet_A:{
-
-            name:
-                'Société A - Usine Principale',
-
-            zones:[
-                'Zone Extrusion',
-                'Zone Assemblage'
-            ],
-
-
-            /*
-             * IMPORTANT
-             * Les équipements possèdent maintenant
-             * un code automatique.
-             *
-             * Exemple :
-             * EQ-001
-             * EQ-002
-             */
-
-            equipements:[
-
-                {
-                    code:'EQ-001',
-                    name:'Presse Hydraulique 01',
-                    zone:'Zone Extrusion'
-                }
-
-            ],
-
-
-            /*
-             * Les sous-équipements utilisent
-             * également un code automatique.
-             */
-
-            subEquipements:[
-
-                {
-                    code:'SE-001',
-                    name:'Vérin Principal',
-                    parent:'EQ-001'
-                }
-
-            ],
-
-
-            techniciens:[
-
-                {
-                    name:'Abdelali Bouzid',
-                    spec:'Électromécanique'
-                }
-
-            ],
-
-
-            di:[],
-            planning:[],
-            pannes:[],
-
-            stock:[
-
-                {
-                    ref:'SKF-6204',
-                    name:'Roulement à billes',
-                    loc:'Rayon A1',
-                    image:'',
-                    qty:5,
-                    min:2
-                }
-
-            ]
-
-        }
-
-    };
-
+function kpiData(){
+const p=P(),H=Math.max(1,+kp.hours||500),N=Math.max(1,p.equipements.length),list=p.pannes.filter(x=>inP(x.date)),per={};
+list.forEach(x=>{const m=per[x.machine]??={n:0,h:0};m.n++;m.h+=+x.hours||0});
+const rows=Object.entries(per).map(([m,v])=>{const up=Math.max(0,H-v.h);return{m,n:v.n,h:v.h,mttr:v.h/v.n,mtbf:up/v.n,disp:up/H*100}}).sort((a,b)=>b.h-a.h);
+const n=list.length,h=list.reduce((s,x)=>s+(+x.hours||0),0),tot=H*N;
+return{rows,n,h,mttr:n?h/n:0,mtbf:n?Math.max(0,tot-h)/n:tot,disp:tot?Math.max(0,tot-h)/tot*100:100};
+}
+const filt=()=>`<div class="flex gap-3 items-end flex-wrap text-[11px] text-slate-400"><label>Du<input type="date" value="${kp.from}" onchange="kp.from=this.value;render()" class="${I}"></label><label>Au<input type="date" value="${kp.to}" onchange="kp.to=this.value;render()" class="${I}"></label><label>Heures de fonctionnement / machine<input type="number" min="1" value="${kp.hours}" onchange="kp.hours=Math.max(1,+this.value||500);render()" class="${I} w-40"></label></div>`;
+function viewKpi(){
+const k=kpiData(),p=P(),cl=p.di.filter(d=>d.status==='Clôturée'),avg=cl.length?(cl.reduce((s,d)=>s+days(d.date,d.closeDate||d.date),0)/cl.length).toFixed(1)+' j':'--',due=p.planning.filter(x=>x.date<=today()),pm=due.length?Math.round(due.filter(x=>x.status==='Réalisé').length/due.length*100)+' %':'--';
+const c=(l,v,col)=>`<div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl"><div class="text-[10px] font-bold text-slate-400 uppercase">${l}</div><div class="text-2xl font-extrabold text-${col}-400 mt-1">${v}</div></div>`;
+return card('📊 Indicateurs',filt())+`<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${c('MTBF',k.mtbf.toFixed(0)+' h','indigo')}${c('MTTR',k.mttr.toFixed(1)+' h','amber')}${c('Disponibilité',k.disp.toFixed(1)+' %','emerald')}${c('Total arrêt',k.h.toFixed(1)+' h','red')}${c('DI ouvertes',p.di.length-cl.length,'amber')}${c('DI clôturées',cl.length,'emerald')}${c('Délai moyen de clôture',avg,'indigo')}${c('Préventif réalisé',pm,'blue')}</div>`+card('Pareto des arrêts par équipement','<div class="h-72"><canvas id="pareto"></canvas></div>')+card('Détail par équipement',tbl(['Équipement','Pannes','Arrêt (h)','MTTR (h)','MTBF (h)','Disponibilité'],k.rows.map(r=>[eq(r.m),r.n,r.h.toFixed(1),r.mttr.toFixed(1),r.mtbf.toFixed(0),r.disp.toFixed(1)+' %']),'Aucune panne sur la période'),btn('emerald','📥 Exporter Excel','xlsx()'));
+}
+function drawChart(){
+const c=$('pareto');if(!c||typeof Chart==='undefined')return;if(chart)chart.destroy();const k=kpiData(),tot=k.h||1;let a=0;
+chart=new Chart(c,{data:{labels:k.rows.map(r=>r.m),datasets:[{type:'bar',label:'Arrêt (h)',data:k.rows.map(r=>r.h),yAxisID:'y'},{type:'line',label:'Cumul %',data:k.rows.map(r=>+(a+=r.h,a/tot*100).toFixed(1)),yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false}}}}});
 }
 
-
-/* =========================================================
-   NORMALISATION DES DONNÉES
-========================================================= */
-
-function norm(p){
-
-    [
-        'zones',
-        'equipements',
-        'subEquipements',
-        'techniciens',
-        'di',
-        'planning',
-        'pannes',
-        'stock'
-
-    ].forEach(
-        k => p[k] ??= []
-    );
-
-
-    /*
-     * Compatibilité avec les anciennes données :
-     *
-     * Si un équipement existant n'a pas de code,
-     * on lui attribue automatiquement un EQ.
-     */
-
-    let eqCounter = 0;
-
-    p.equipements.forEach(e => {
-
-        if(!e.code){
-
-            eqCounter++;
-
-            e.code =
-                'EQ-' +
-                String(eqCounter)
-                    .padStart(3,'0');
-
-        }
-
-    });
-
-
-    /*
-     * Recherche du numéro EQ le plus élevé.
-     */
-
-    const maxEQ =
-        Math.max(
-            0,
-            ...p.equipements.map(
-                e =>
-                    parseInt(
-                        String(e.code || '')
-                            .replace(/\D/g,'')
-                    ) || 0
-            )
-        );
-
-
-    /*
-     * Si plusieurs anciens équipements
-     * possèdent déjà des codes, on continue
-     * après le plus grand numéro.
-     */
-
-    eqCounter = maxEQ;
-
-
-    /*
-     * Compatibilité sous-équipements.
-     */
-
-    let seCounter = 0;
-
-    p.subEquipements.forEach(s => {
-
-        if(!s.code){
-
-            seCounter++;
-
-            s.code =
-                'SE-' +
-                String(seCounter)
-                    .padStart(3,'0');
-
-        }
-
-    });
-
-
-    const maxSE =
-        Math.max(
-            0,
-            ...p.subEquipements.map(
-                s =>
-                    parseInt(
-                        String(s.code || '')
-                            .replace(/\D/g,'')
-                    ) || 0
-            )
-        );
-
-
-    seCounter = maxSE;
-
-
-    /*
-     * Compatibilité DI / OT.
-     */
-
-    let n =
-        Math.max(
-            0,
-            ...p.di.map(
-                d =>
-                    +String(
-                        d.id || ''
-                    ).slice(3) || 0
-            )
-        );
-
-
-    p.di.forEach(d => {
-
-        if(!d.id){
-
-            n++;
-
-            d.id =
-                'OT-' +
-                String(n)
-                    .padStart(4,'0');
-
-        }
-
-    });
-
+function viewRep(){
+const p=P(),k=kpiData(),d=p.di.filter(x=>inP(x.date)),pl=p.planning.filter(x=>inP(x.date)),pn=p.pannes.filter(x=>inP(x.date)),low=p.stock.filter(s=>s.qty<=s.min);
+return card('🧾 Rapport de maintenance',filt(),btn('slate','🖨️ Imprimer / PDF','window.print()')+btn('emerald','📥 Excel','xlsx()'))+
+`<div id="printable" class="p-6 rounded-xl space-y-4 text-xs"><div class="flex justify-between border-b pb-3"><div><h3 class="text-lg font-bold">RAPPORT DE MAINTENANCE</h3><p>${esc(p.name)} — du ${esc(kp.from||'début')} au ${esc(kp.to||today())}</p></div><p>Édité par ${esc(me.user)} le ${today()}</p></div>
+<textarea rows="3" oninput="note=this.value" class="w-full border rounded p-2 text-xs" style="color:#0f172a;background:#fff">${esc(note)}</textarea>
+<p><b>MTBF</b> ${k.mtbf.toFixed(0)} h · <b>MTTR</b> ${k.mttr.toFixed(1)} h · <b>Disponibilité</b> ${k.disp.toFixed(1)} % · <b>Arrêt total</b> ${k.h.toFixed(1)} h · <b>Pannes</b> ${k.n}</p>
+<h4 class="font-bold">DI / Ordres de travail (${d.length})</h4>${tbl(['N°','Date','Équipement','Description','Priorité','Technicien','Statut'],d.map(x=>[esc(x.id),esc(x.date),eq(x.machine),esc(x.desc),esc(x.priority),esc(x.tech||'-'),esc(x.status)]))}
+<h4 class="font-bold">Pannes (${pn.length})</h4>${tbl(['Date','Équipement','Symptôme','Pièce','Arrêt','Technicien'],pn.map(x=>[esc(x.date),eq(x.machine),esc(x.desc),esc(x.part),x.hours+' h',esc(x.tech||'-')]))}
+<h4 class="font-bold">Préventif (${pl.length})</h4>${tbl(['Date','Équipement','Tâche','Technicien','Statut'],pl.map(x=>[esc(x.date),eq(x.machine),esc(x.task),esc(x.tech||'-'),esc(x.status)]))}
+<h4 class="font-bold">Pièces sous le seuil (${low.length})</h4>${tbl(['Référence','Désignation','Qté','Seuil'],low.map(s=>[esc(s.ref),esc(s.name),s.qty,s.min]),'Aucune alerte')}</div>`
 }
 
+function viewUsers(){const u=users();return card('👥 Utilisateurs & rôles','<p class="text-[11px] text-slate-400">Administrateur : accès complet. Technicien : DI/OT, pannes, préventif, entrées de stock, consultation.</p>'+tbl(['Identifiant','Rôle','Actions'],u.map((x,i)=>[esc(x.user)+(x.user===me.user?' (vous)':''),`<select onchange="setRole(${i},this.value)" ${x.user===me.user?'disabled':''} class="${I} mt-0"><option value="tech" ${x.role==='tech'?'selected':''}>Technicien</option><option value="admin" ${x.role==='admin'?'selected':''}>Administrateur</option></select>`,lnk('Réinitialiser',`resetPw(${i})`,'text-amber-400')+(x.user!==me.user?lnk('Supprimer',`delUser(${i})`):'')])),btn('indigo','＋ Nouvel utilisateur','addUser()'))}
 
-/* =========================================================
-   CHARGEMENT DE LA BASE LOCALE
-========================================================= */
-
-function loadDB(){
-
-    let d;
-
-    try{
-
-        d =
-            JSON.parse(
-                localStorage.getItem(KEY)
-            );
-
-    }catch(e){}
-
-
-    db =
-        d &&
-        Object.keys(d).length
-            ? d
-            : defaultDB();
-
-
-    Object.values(db)
-        .forEach(norm);
-
-
-    cur =
-        Object.keys(db)[0];
-
-
-    save();
-
+function xlsx(){
+if(typeof XLSX==='undefined')return alert('Bibliothèque Excel non chargée (connexion internet requise).');
+const p=P(),wb=XLSX.utils.book_new(),add=(n,r)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(r.length?r:[{}]),n);
+add('DI-OT',p.di.map(d=>({OT:d.id,Date:d.date,Equipement:d.machine,Description:d.desc,Priorite:d.priority,Technicien:d.tech||'',Statut:d.status,Debut:d.start||'',Cloture:d.closeDate||'',Heures:d.hours??'',Compte_rendu:d.note||''})));
+add('Preventif',p.planning.map(x=>({Date:x.date,Equipement:x.machine,Tache:x.task,Frequence:x.freq,Technicien:x.tech||'',Statut:x.status})));
+add('Pannes',p.pannes.map(x=>({Date:x.date,Equipement:x.machine,Sous_equipement:x.subEq||'',Symptome:x.desc,Piece:x.part||'',Arret_h:x.hours,Technicien:x.tech||''})));
+add('Stock',p.stock.map(s=>({Reference:s.ref,Designation:s.name,Emplacement:s.loc||'',Quantite:s.qty,Seuil:s.min})));
+add('KPIs',kpiData().rows.map(r=>({Equipement:r.m,Pannes:r.n,Arret_h:+r.h.toFixed(1),MTTR_h:+r.mttr.toFixed(2),MTBF_h:+r.mtbf.toFixed(0),Disponibilite_pct:+r.disp.toFixed(1)})));
+XLSX.writeFile(wb,`GMAO_${p.name.replace(/\W+/g,'_')}_${today()}.xlsx`)
 }
+function expJSON(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download=`GMAO_Pro_Backup_${today()}.json`;document.body.appendChild(a);a.click();a.remove()}
+function imp(e){const f=e.target.files[0];if(!f||!isAdmin())return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d!=='object'||Array.isArray(d)||!Object.keys(d).length)throw 0;Object.values(d).forEach(norm);db=d;cur=Object.keys(db)[0];save();render();alert('Données restaurées.')}catch(x){alert('Fichier invalide.')}};r.readAsText(f);e.target.value=''}
 
+initAuth();applyBg();
+</script>
+</body>
+</html>
 
-/* =========================================================
-   GÉNÉRATION AUTOMATIQUE DES CODES
-========================================================= */
-
-/*
- * Génère le prochain code équipement.
- *
- * EQ-001
- * EQ-002
- * EQ-003
- * ...
- */
-
-function nextEquipmentCode(){
-
-    const list =
-        P().equipements || [];
-
-
-    const max =
-        Math.max(
-            0,
-            ...list.map(e => {
-
-                const n =
-                    parseInt(
-                        String(e.code || '')
-                            .match(/\d+/)?.[0]
-                    );
-
-                return Number.isFinite(n)
-                    ? n
-                    : 0;
-
-            })
-        );
-
-
-    return (
-        'EQ-' +
-        String(max + 1)
-            .padStart(3,'0')
-    );
-
-}
-
-
-/*
- * Génère le prochain code sous-équipement.
- *
- * SE-001
- * SE-002
- * SE-003
- * ...
- */
-
-function nextSubEquipmentCode(){
-
-    const list =
-        P().subEquipements || [];
-
-
-    const max =
-        Math.max(
-            0,
-            ...list.map(s => {
-
-                const n =
-                    parseInt(
-                        String(s.code || '')
-                            .match(/\d+/)?.[0]
-                    );
-
-                return Number.isFinite(n)
-                    ? n
-                    : 0;
-
-            })
-        );
-
-
-    return (
-        'SE-' +
-        String(max + 1)
-            .padStart(3,'0')
-    );
-
-}
-
-
-/*
- * Génération OT existante.
- */
-
-const nextId = () =>
-    'OT-' +
-    String(
-        Math.max(
-            0,
-            ...P().di.map(
-                d =>
-                    +String(d.id)
-                        .slice(3) || 0
-            )
-        ) + 1
-    ).padStart(4,'0');
-
-
-const di = id =>
-    P().di.find(
-        d => d.id === id
-    );
-
-
-/* =========================================================
-   AUTHENTIFICATION
-========================================================= */
-
-const sha = async t =>
-    [
-        ...new Uint8Array(
-            await crypto.subtle.digest(
-                'SHA-256',
-                new TextEncoder().encode(t)
-            )
-        )
-    ]
-    .map(
-        x =>
-            x.toString(16)
-             .padStart(2,'0')
-    )
-    .join('');
-
-
-const users = () => {
-
-    try{
-
-        const u =
-            JSON.parse(
-                localStorage.getItem(UKEY)
-            );
-
-        if(u && u.length)
-            return u;
-
-    }catch(e){}
-
-
-    try{
-
-        const o =
-            JSON.parse(
-                localStorage.getItem(
-                    'GMAO_PRO_AUTH'
-                )
-            );
-
-        if(o)
-            return [
-                {
-                    ...o,
-                    role:'admin'
-                }
-            ];
-
-    }catch(e){}
-
-
-    return [];
-
-};
-
-
-const saveUsers = u =>
-    localStorage.setItem(
-        UKEY,
-        JSON.stringify(u)
-    );
-
-
-const mk = async (
-    user,
-    pass,
-    role
-) => {
-
-    const salt =
-        crypto.randomUUID();
-
-
-    return {
-
-        user,
-
-        salt,
-
-        hash:
-            await sha(
-                salt + pass
-            ),
-
-        role
-
-    };
-
-};
-
-
-const amsg = m => {
-
-    $('am').textContent = m;
-
-    $('am')
-        .classList
-        .remove('hidden');
-
-};
-
-
-let fails = 0;
-let lock = 0;
-
-
-/* =========================================================
-   INITIALISATION AUTH
-========================================================= */
-
-function initAuth(){
-
-    if(!users().length){
-
-        $('cw')
-            .classList
-            .remove('hidden');
-
-        $('lc').required = true;
-
-        $('ab').textContent =
-            'Créer le compte administrateur';
-
-    }
-
-}
-
-
-/* =========================================================
-   CONNEXION
-========================================================= */
-
-async function login(e){
-
-    e.preventDefault();
-
-
-    if(Date.now() < lock){
-
-        return amsg(
-            'Trop d\'essais. Patientez 30 secondes.'
-        );
-
-    }
-
-
-    const u =
-        $('lu')
-            .value
-            .trim();
-
-
-    const p =
-        $('lp')
-            .value;
-
-
-    const us =
-        users();
-
-
-    /*
-     * Première connexion :
-     * création du compte administrateur.
-     */
-
-    if(!us.length){
-
-        if(p.length < 6)
-
-            return amsg(
-                'Mot de passe : 6 caractères minimum.'
-            );
-
-
-        if(
-            p !==
-            $('lc').value
-        )
-
-            return amsg(
-                'Les mots de passe ne correspondent pas.'
-            );
-
-
-        me =
-            await mk(
-                u,
-                p,
-                'admin'
-            );
-
-
-        saveUsers([
-            me
-        ]);
-
-    }
-
-    else{
-
-        const a =
-            us.find(
-                x =>
-                    x.user
-                        .toLowerCase()
-                    ===
-                    u.toLowerCase()
-            );
-
-
-        if(
-            !a ||
-            await sha(
-                a.salt + p
-            ) !== a.hash
-        ){
-
-            if(++fails >= 5){
-
-                lock =
-                    Date.now() + 30000;
-
-                fails = 0;
-
-            }
-
-
-            return amsg(
-                'Identifiant ou mot de passe incorrect.'
-            );
-
-        }
-
-
-        me = a;
-
-        fails = 0;
-
-    }
-
-
-    $('lp').value = '';
-    $('lc').value = '';
-
-    $('am')
-        .classList
-        .add('hidden');
-
-
-    $('auth')
-        .classList
-        .add('hidden');
-
-
-    $('app')
-        .classList
-        .remove('hidden');
-
-
-    loadDB();
-
-    tab = 'dash';
-
-    render();
-
-}
-
-
-/* =========================================================
-   DÉCONNEXION
-========================================================= */
-
-function logout(){
-
-    me = null;
-    db = null;
-
-    $('lp').value = '';
-
-    $('app')
-        .classList
-        .add('hidden');
-
-    $('auth')
-        .classList
-        .remove('hidden');
-
-    $('view').innerHTML = '';
-
-}
-
-
-/* =========================================================
-   CHANGEMENT MOT DE PASSE
-========================================================= */
-
-function myPw(){
-
-    form(
-        'Changer mon mot de passe',
-
-        [
-            {
-                n:'o',
-                l:'Ancien mot de passe',
-                t:'password',
-                r:1
-            },
-
-            {
-                n:'n',
-                l:'Nouveau (6 min.)',
-                t:'password',
-                r:1
-            },
-
-            {
-                n:'c',
-                l:'Confirmer',
-                t:'password',
-                r:1
-            }
-
-        ],
-
-        async d => {
-
-            const us =
-                users();
-
-            const a =
-                us.find(
-                    x =>
-                        x.user === me.user
-                );
-
-
-            if(
-                await sha(
-                    a.salt + d.o
-                ) !== a.hash
-            )
-
-                return
-                    'Ancien mot de passe incorrect.';
-
-
-            if(d.n.length < 6)
-
-                return
-                    'Mot de passe trop court.';
-
-
-            if(d.n !== d.c)
-
-                return
-                    'La confirmation ne correspond pas.';
-
-
-            const n =
-                await mk(
-                    a.user,
-                    d.n,
-                    a.role
-                );
-
-
-            Object.assign(
-                a,
-                n
-            );
-
-
-            saveUsers(us);
-
-            me = a;
-
-            return null;
-
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   UTILISATEURS
-========================================================= */
-
-const admins =
-    us =>
-        us.filter(
-            x =>
-                x.role === 'admin'
-        ).length;
-
-
-function addUser(){
-
-    form(
-        'Nouvel utilisateur',
-
-        [
-            {
-                n:'user',
-                l:'Identifiant',
-                r:1
-            },
-
-            {
-                n:'pw',
-                l:'Mot de passe (6 min.)',
-                t:'password',
-                r:1
-            },
-
-            {
-                n:'role',
-                l:'Rôle',
-                t:'select',
-                o:[
-                    [
-                        'tech',
-                        'Technicien'
-                    ],
-                    [
-                        'admin',
-                        'Administrateur'
-                    ]
-                ]
-            }
-
-        ],
-
-        async d => {
-
-            const u =
-                users();
-
-
-            if(
-                d.pw.length < 6
-            )
-
-                return
-                    'Mot de passe trop court.';
-
-
-            if(
-                u.some(
-                    x =>
-                        x.user
-                            .toLowerCase()
-                        ===
-                        d.user
-                            .toLowerCase()
-                )
-            )
-
-                return
-                    'Identifiant déjà utilisé.';
-
-
-            u.push(
-                await mk(
-                    d.user.trim(),
-                    d.pw,
-                    d.role
-                )
-            );
-
-
-            saveUsers(u);
-
-        }
-
-    );
-
-}
-
-
-function setRole(i,r){
-
-    const u =
-        users();
-
-
-    if(
-        u[i].role === 'admin' &&
-        r !== 'admin' &&
-        admins(u) < 2
-    ){
-
-        alert(
-            'Il faut au moins un administrateur.'
-        );
-
-        return render();
-
-    }
-
-
-    u[i].role = r;
-
-    saveUsers(u);
-
-    render();
-
-}
-
-
-function resetPw(i){
-
-    form(
-        'Nouveau mot de passe',
-
-        [
-            {
-                n:'n',
-                l:'Nouveau mot de passe (6 min.)',
-                t:'password',
-                r:1
-            }
-        ],
-
-        async d => {
-
-            if(d.n.length < 6)
-
-                return
-                    'Mot de passe trop court.';
-
-
-            const u =
-                users();
-
-
-            Object.assign(
-                u[i],
-                await mk(
-                    u[i].user,
-                    d.n,
-                    u[i].role
-                )
-            );
-
-
-            saveUsers(u);
-
-            return null;
-
-        }
-
-    );
-
-}
-
-
-function delUser(i){
-
-    const u =
-        users();
-
-
-    if(
-        u[i].user === me.user
-    )
-
-        return alert(
-            'Vous ne pouvez pas supprimer votre propre compte.'
-        );
-
-
-    if(
-        !confirm(
-            'Supprimer ' +
-            u[i].user +
-            ' ?'
-        )
-    )
-
-        return;
-
-
-    u.splice(i,1);
-
-    saveUsers(u);
-
-    render();
-
-}
-
-
-/* =========================================================
-   ARRIÈRE-PLAN
-========================================================= */
-
-function applyBg(){
-
-    let b = '';
-
-    try{
-
-        b =
-            localStorage.getItem(BGK)
-            || '';
-
-    }catch(e){}
-
-
-    if(b){
-
-        document.body.style.setProperty(
-            '--bg',
-            'url("' + b + '")'
-        );
-
-        document.body.classList.add(
-            'has-bg'
-        );
-
-    }
-
-    else{
-
-        document.body.classList.remove(
-            'has-bg'
-        );
-
-    }
-
-}
-
-
-function setBg(e){
-
-    const f =
-        e.target.files[0];
-
-
-    if(!f)
-        return;
-
-
-    const u =
-        URL.createObjectURL(f);
-
-
-    const im =
-        new Image();
-
-
-    im.onload = () => {
-
-        const r =
-            Math.min(
-                1,
-                1600 / im.width
-            );
-
-
-        const c =
-            document.createElement(
-                'canvas'
-            );
-
-
-        c.width =
-            im.width * r;
-
-
-        c.height =
-            im.height * r;
-
-
-        c.getContext('2d')
-            .drawImage(
-                im,
-                0,
-                0,
-                c.width,
-                c.height
-            );
-
-
-        try{
-
-            localStorage.setItem(
-                BGK,
-                c.toDataURL(
-                    'image/jpeg',
-                    .7
-                )
-            );
-
-        }catch(x){
-
-            alert(
-                'Image trop lourde.'
-            );
-
-        }
-
-
-        URL.revokeObjectURL(u);
-
-        applyBg();
-
-    };
-
-
-    im.src = u;
-
-    e.target.value = '';
-
-}
-
-
-function resetBg(){
-
-    localStorage.removeItem(BGK);
-
-    applyBg();
-
-}
-
-
-/* =========================================================
-   FIN PARTIE 1/3
-========================================================= */
