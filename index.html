@@ -1,230 +1,1616 @@
 <!DOCTYPE html>
 <html lang="fr" class="bg-slate-950">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Smart Maintenance Pro - GMAO V16</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
-body{font-family:system-ui,-apple-system,sans-serif}
-body.has-bg{background-image:linear-gradient(rgba(2,6,23,.75),rgba(2,6,23,.75)),var(--bg);background-size:cover;background-position:center;background-attachment:fixed}
-#app .bg-slate-900{background-color:rgba(15,23,42,.85)}
-.hb{background:#1e293b;border:1px solid #334155;padding:.5rem .75rem;border-radius:.75rem;font-size:.75rem}.hb:hover{background:#334155}
-#printable{background:#fff}#printable td,#printable th,#printable h3,#printable h4,#printable p,#printable div{color:#0f172a!important}#printable thead{background:#e2e8f0}
-@media print{body *{visibility:hidden}#printable,#printable *{visibility:visible}#printable{position:absolute;left:0;top:0;width:100%}}
+body{
+    font-family:system-ui,-apple-system,sans-serif
+}
+
+body.has-bg{
+    background-image:
+        linear-gradient(
+            rgba(2,6,23,.75),
+            rgba(2,6,23,.75)
+        ),
+        var(--bg);
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed
+}
+
+#app .bg-slate-900{
+    background-color:rgba(15,23,42,.85)
+}
+
+.hb{
+    background:#1e293b;
+    border:1px solid #334155;
+    padding:.5rem .75rem;
+    border-radius:.75rem;
+    font-size:.75rem
+}
+
+.hb:hover{
+    background:#334155
+}
+
+#printable{
+    background:#fff
+}
+
+#printable td,
+#printable th,
+#printable h3,
+#printable h4,
+#printable p,
+#printable div{
+    color:#0f172a!important
+}
+
+#printable thead{
+    background:#e2e8f0
+}
+
+@media print{
+    body *{
+        visibility:hidden
+    }
+
+    #printable,
+    #printable *{
+        visibility:visible
+    }
+
+    #printable{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%
+    }
+}
 </style>
 </head>
+
 <body class="bg-slate-950 text-slate-100 min-h-screen">
 
-<div id="auth" class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
- <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8">
-  <div class="text-center mb-6"><div class="text-4xl mb-2">⚙️</div><h2 class="text-2xl font-bold">Smart Maintenance Pro</h2><p class="text-xs text-slate-400 mt-1">GMAO • Ordres de travail • KPIs</p></div>
-  <form onsubmit="login(event)" class="space-y-4" autocomplete="off">
-   <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Identifiant</label><input id="lu" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
-   <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Mot de passe</label><input id="lp" type="password" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
-   <div id="cw" class="hidden"><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Confirmer le mot de passe</label><input id="lc" type="password" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
-   <p id="am" class="hidden text-xs text-red-400"></p>
-   <button id="ab" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl">Se connecter</button>
-  </form>
- </div>
+<!-- =========================================================
+     AUTHENTIFICATION
+========================================================= -->
+
+<div id="auth"
+     class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm
+            flex items-center justify-center p-4">
+
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl
+                shadow-2xl max-w-md w-full p-8">
+
+        <div class="text-center mb-6">
+
+            <div class="text-4xl mb-2">
+                ⚙️
+            </div>
+
+            <h2 class="text-2xl font-bold">
+                Smart Maintenance Pro
+            </h2>
+
+            <p class="text-xs text-slate-400 mt-1">
+                GMAO • Ordres de travail • KPIs
+            </p>
+
+        </div>
+
+        <form onsubmit="login(event)"
+              class="space-y-4"
+              autocomplete="off">
+
+            <div>
+
+                <label class="block text-xs font-bold
+                              text-slate-400 uppercase mb-1">
+                    Identifiant
+                </label>
+
+                <input
+                    id="lu"
+                    required
+                    class="w-full px-4 py-2.5
+                           bg-slate-950
+                           border border-slate-800
+                           rounded-xl
+                           text-sm text-white
+                           outline-none
+                           focus:ring-2
+                           focus:ring-indigo-500">
+            </div>
+
+
+            <div>
+
+                <label class="block text-xs font-bold
+                              text-slate-400 uppercase mb-1">
+                    Mot de passe
+                </label>
+
+                <input
+                    id="lp"
+                    type="password"
+                    required
+                    class="w-full px-4 py-2.5
+                           bg-slate-950
+                           border border-slate-800
+                           rounded-xl
+                           text-sm text-white
+                           outline-none
+                           focus:ring-2
+                           focus:ring-indigo-500">
+            </div>
+
+
+            <div id="cw" class="hidden">
+
+                <label class="block text-xs font-bold
+                              text-slate-400 uppercase mb-1">
+                    Confirmer le mot de passe
+                </label>
+
+                <input
+                    id="lc"
+                    type="password"
+                    class="w-full px-4 py-2.5
+                           bg-slate-950
+                           border border-slate-800
+                           rounded-xl
+                           text-sm text-white
+                           outline-none
+                           focus:ring-2
+                           focus:ring-indigo-500">
+            </div>
+
+
+            <p id="am"
+               class="hidden text-xs text-red-400">
+            </p>
+
+
+            <button
+                id="ab"
+                class="w-full bg-indigo-600
+                       hover:bg-indigo-500
+                       text-white
+                       font-semibold
+                       py-3
+                       rounded-xl">
+
+                Se connecter
+
+            </button>
+
+        </form>
+
+    </div>
 </div>
+
+
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
 
 <div id="app" class="hidden min-h-screen">
- <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30"><div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-3">
-  <h1 class="text-lg font-bold">🏭 GMAO PRO <span class="text-xs bg-indigo-600 px-2 py-0.5 rounded-full">V16</span></h1>
-  <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800"><span>🏢</span><select id="co" onchange="cur=this.value;render()" class="bg-transparent text-xs font-semibold outline-none"></select><button id="addco" onclick="addCo()" class="text-xs bg-indigo-600 px-2 py-1 rounded-lg">＋</button></div>
-  <div class="flex items-center gap-2 flex-wrap">
-   <span id="who" class="text-xs text-slate-400"></span>
-   <button onclick="xlsx()" class="hb text-emerald-300">📥 Excel</button>
-   <button onclick="expJSON()" class="hb text-emerald-300">💾 Sauvegarde</button>
-   <button id="rest" onclick="$('fi').click()" class="hb text-indigo-300">📤 Restaurer</button>
-   <input type="file" id="fi" accept=".json" class="hidden" onchange="imp(event)">
-   <button onclick="$('bgf').click()" class="hb text-amber-300">🖼️ Arrière-plan</button>
-   <button onclick="resetBg()" class="hb" title="Retirer l'image">✕</button>
-   <input type="file" id="bgf" accept="image/*" class="hidden" onchange="setBg(event)">
-   <button onclick="myPw()" class="hb">🔑</button>
-   <button onclick="logout()" class="hb text-red-400">⏻</button>
-  </div></div></header>
- <main class="max-w-7xl mx-auto px-4 py-6 space-y-6"><div id="tabs" class="flex gap-2 overflow-x-auto bg-slate-900/60 p-2 rounded-2xl"></div><div id="view" class="space-y-6"></div></main>
+
+    <header
+        class="bg-slate-900
+               border-b border-slate-800
+               sticky top-0 z-30">
+
+        <div
+            class="max-w-7xl mx-auto
+                   px-4 py-3
+                   flex justify-between
+                   items-center
+                   flex-wrap gap-3">
+
+
+            <h1 class="text-lg font-bold">
+
+                🏭 GMAO PRO
+
+                <span
+                    class="text-xs
+                           bg-indigo-600
+                           px-2 py-0.5
+                           rounded-full">
+
+                    V16
+
+                </span>
+
+            </h1>
+
+
+            <div
+                class="flex items-center gap-2
+                       bg-slate-950
+                       px-3 py-1.5
+                       rounded-xl
+                       border border-slate-800">
+
+                <span>🏢</span>
+
+                <select
+                    id="co"
+                    onchange="cur=this.value;render()"
+                    class="bg-transparent
+                           text-xs
+                           font-semibold
+                           outline-none">
+                </select>
+
+                <button
+                    id="addco"
+                    onclick="addCo()"
+                    class="text-xs
+                           bg-indigo-600
+                           px-2 py-1
+                           rounded-lg">
+
+                    ＋
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="flex items-center
+                       gap-2
+                       flex-wrap">
+
+                <span
+                    id="who"
+                    class="text-xs text-slate-400">
+                </span>
+
+
+                <button
+                    onclick="xlsx()"
+                    class="hb text-emerald-300">
+
+                    📥 Excel
+
+                </button>
+
+
+                <button
+                    onclick="expJSON()"
+                    class="hb text-emerald-300">
+
+                    💾 Sauvegarde
+
+                </button>
+
+
+                <button
+                    id="rest"
+                    onclick="$('fi').click()"
+                    class="hb text-indigo-300">
+
+                    📤 Restaurer
+
+                </button>
+
+
+                <input
+                    type="file"
+                    id="fi"
+                    accept=".json"
+                    class="hidden"
+                    onchange="imp(event)">
+
+
+                <button
+                    onclick="$('bgf').click()"
+                    class="hb text-amber-300">
+
+                    🖼️ Arrière-plan
+
+                </button>
+
+
+                <button
+                    onclick="resetBg()"
+                    class="hb"
+                    title="Retirer l'image">
+
+                    ✕
+
+                </button>
+
+
+                <input
+                    type="file"
+                    id="bgf"
+                    accept="image/*"
+                    class="hidden"
+                    onchange="setBg(event)">
+
+
+                <button
+                    onclick="myPw()"
+                    class="hb">
+
+                    🔑
+
+                </button>
+
+
+                <button
+                    onclick="logout()"
+                    class="hb text-red-400">
+
+                    ⏻
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main
+        class="max-w-7xl mx-auto
+               px-4 py-6
+               space-y-6">
+
+        <div
+            id="tabs"
+            class="flex gap-2
+                   overflow-x-auto
+                   bg-slate-900/60
+                   p-2 rounded-2xl">
+        </div>
+
+
+        <div
+            id="view"
+            class="space-y-6">
+        </div>
+
+    </main>
+
 </div>
-<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4"></div>
+
+
+<!-- =========================================================
+     MODAL
+========================================================= -->
+
+<div
+    id="modal"
+    class="hidden
+           fixed inset-0 z-50
+           bg-slate-950/80
+           flex items-center
+           justify-center p-4">
+</div>
+
 
 <script>
-const KEY='GMAO_PRO_FR_DB',UKEY='GMAO_PRO_USERS',BGK='GMAO_PRO_BG';
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let db,cur,me,tab='dash',diF='Tous',kp={from:'',to:'',hours:500},chart,note='Synthèse des interventions, pannes et état du stock.';
-const P=()=>db[cur],isAdmin=()=>me&&me.role==='admin',today=()=>new Date().toISOString().slice(0,10);
-const days=(a,b)=>Math.max(0,Math.round((new Date(b)-new Date(a))/864e5));
-const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
-const inP=d=>(!kp.from||d>=kp.from)&&(!kp.to||d<=kp.to);
-const I='bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white block mt-1';
 
-/* ---------- Données ---------- */
-function defaultDB(){return{Projet_A:{name:'Société A - Usine Principale',zones:['Zone Extrusion','Zone Assemblage'],equipements:[{code:'EQ-01',name:'Presse Hydraulique 01',zone:'Zone Extrusion'}],subEquipements:[{name:'Vérin Principal',parent:'EQ-01'}],techniciens:[{name:'Abdelali Bouzid',spec:'Électromécanique'}],di:[],planning:[],pannes:[],stock:[{ref:'SKF-6204',name:'Roulement à billes',loc:'Rayon A1',image:'',qty:5,min:2}]}}}
-function norm(p){['zones','equipements','subEquipements','techniciens','di','planning','pannes','stock'].forEach(k=>p[k]??=[]);let n=Math.max(0,...p.di.map(d=>+String(d.id||'').slice(3)||0));p.di.forEach(d=>{d.id??='OT-'+String(++n).padStart(4,'0')})}
-function loadDB(){let d;try{d=JSON.parse(localStorage.getItem(KEY))}catch(e){}db=d&&Object.keys(d).length?d:defaultDB();Object.values(db).forEach(norm);cur=Object.keys(db)[0];save()}
-const nextId=()=>'OT-'+String(Math.max(0,...P().di.map(d=>+d.id.slice(3)||0))+1).padStart(4,'0');
-const di=id=>P().di.find(d=>d.id===id);
+/* =========================================================
+   CONFIGURATION GÉNÉRALE
+========================================================= */
 
-/* ---------- Authentification & utilisateurs ---------- */
-const sha=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(x=>x.toString(16).padStart(2,'0')).join('');
-const users=()=>{try{const u=JSON.parse(localStorage.getItem(UKEY));if(u&&u.length)return u}catch(e){}try{const o=JSON.parse(localStorage.getItem('GMAO_PRO_AUTH'));if(o)return[{...o,role:'admin'}]}catch(e){}return[]};
-const saveUsers=u=>localStorage.setItem(UKEY,JSON.stringify(u));
-const mk=async(user,pass,role)=>{const salt=crypto.randomUUID();return{user,salt,hash:await sha(salt+pass),role}};
-const amsg=m=>{$('am').textContent=m;$('am').classList.remove('hidden')};
-let fails=0,lock=0;
-function initAuth(){if(!users().length){$('cw').classList.remove('hidden');$('lc').required=true;$('ab').textContent='Créer le compte administrateur'}}
-async function login(e){e.preventDefault();
- if(Date.now()<lock)return amsg('Trop d\'essais. Patientez 30 secondes.');
- const u=$('lu').value.trim(),p=$('lp').value,us=users();
- if(!us.length){if(p.length<6)return amsg('Mot de passe : 6 caractères minimum.');if(p!==$('lc').value)return amsg('Les mots de passe ne correspondent pas.');me=await mk(u,p,'admin');saveUsers([me])}
- else{const a=us.find(x=>x.user.toLowerCase()===u.toLowerCase());if(!a||await sha(a.salt+p)!==a.hash){if(++fails>=5){lock=Date.now()+30000;fails=0}return amsg('Identifiant ou mot de passe incorrect.')}me=a;fails=0}
- $('lp').value='';$('lc').value='';$('am').classList.add('hidden');$('auth').classList.add('hidden');$('app').classList.remove('hidden');loadDB();tab='dash';render()}
-function logout(){me=null;db=null;$('lp').value='';$('app').classList.add('hidden');$('auth').classList.remove('hidden');$('view').innerHTML=''}
-function myPw(){form('Changer mon mot de passe',[{n:'o',l:'Ancien mot de passe',t:'password',r:1},{n:'n',l:'Nouveau (6 min.)',t:'password',r:1},{n:'c',l:'Confirmer',t:'password',r:1}],async d=>{
- const us=users(),a=us.find(x=>x.user===me.user);if(await sha(a.salt+d.o)!==a.hash)return'Ancien mot de passe incorrect.';
- if(d.n.length<6)return'Mot de passe trop court.';if(d.n!==d.c)return'La confirmation ne correspond pas.';
- const n=await mk(a.user,d.n,a.role);Object.assign(a,n);saveUsers(us);me=a;return null})}
-const admins=us=>us.filter(x=>x.role==='admin').length;
-function addUser(){form('Nouvel utilisateur',[{n:'user',l:'Identifiant',r:1},{n:'pw',l:'Mot de passe (6 min.)',t:'password',r:1},{n:'role',l:'Rôle',t:'select',o:[['tech','Technicien'],['admin','Administrateur']]}],async d=>{
- const u=users();if(d.pw.length<6)return'Mot de passe trop court.';if(u.some(x=>x.user.toLowerCase()===d.user.toLowerCase()))return'Identifiant déjà utilisé.';
- u.push(await mk(d.user.trim(),d.pw,d.role));saveUsers(u)})}
-function setRole(i,r){const u=users();if(u[i].role==='admin'&&r!=='admin'&&admins(u)<2){alert('Il faut au moins un administrateur.');return render()}u[i].role=r;saveUsers(u);render()}
-function resetPw(i){form('Nouveau mot de passe',[{n:'n',l:'Nouveau mot de passe (6 min.)',t:'password',r:1}],async d=>{if(d.n.length<6)return'Mot de passe trop court.';const u=users();Object.assign(u[i],await mk(u[i].user,d.n,u[i].role));saveUsers(u);return null})}
-function delUser(i){const u=users();if(u[i].user===me.user)return alert('Vous ne pouvez pas supprimer votre propre compte.');if(!confirm('Supprimer '+u[i].user+' ?'))return;u.splice(i,1);saveUsers(u);render()}
+const KEY = 'GMAO_PRO_FR_DB';
+const UKEY = 'GMAO_PRO_USERS';
+const BGK = 'GMAO_PRO_BG';
 
-/* ---------- Arrière-plan ---------- */
-function applyBg(){let b='';try{b=localStorage.getItem(BGK)||''}catch(e){}if(b){document.body.style.setProperty('--bg','url("'+b+'")');document.body.classList.add('has-bg')}else document.body.classList.remove('has-bg')}
-function setBg(e){const f=e.target.files[0];if(!f)return;const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const r=Math.min(1,1600/im.width),c=document.createElement('canvas');c.width=im.width*r;c.height=im.height*r;c.getContext('2d').drawImage(im,0,0,c.width,c.height);try{localStorage.setItem(BGK,c.toDataURL('image/jpeg',.7))}catch(x){alert('Image trop lourde.')}URL.revokeObjectURL(u);applyBg()};im.src=u;e.target.value=''}
-function resetBg(){localStorage.removeItem(BGK);applyBg()}
+const $ = id =>
+    document.getElementById(id);
 
-/* ---------- Composants UI ---------- */
-const tbl=(h,rows,empty='Aucune donnée')=>`<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-950 text-slate-400 uppercase"><tr>${h.map(x=>`<th class="p-3">${x}</th>`).join('')}</tr></thead><tbody class="divide-y divide-slate-800/60 text-slate-300">${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td class="p-3">${c}</td>`).join('')}</tr>`).join(''):`<tr><td class="p-4 text-slate-500" colspan="${h.length}">${empty}</td></tr>`}</tbody></table></div>`;
-const card=(t,b,a='')=>`<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4"><div class="flex justify-between items-center flex-wrap gap-2"><h2 class="font-bold text-sm text-white">${t}</h2><div class="flex gap-2 flex-wrap">${a}</div></div>${b}</div>`;
-const btn=(c,l,f)=>`<button onclick="${f}" class="bg-${c}-600 hover:bg-${c}-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold">${l}</button>`;
-const lnk=(l,f,c='text-red-400')=>`<button onclick="${f}" class="${c} hover:underline mr-2">${l}</button>`;
-const badge=(t,c)=>`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-${c}-500/20 text-${c}-400">${esc(t)}</span>`;
-const eq=c=>{const e=P().equipements.find(x=>x.code===c);return esc(c)+(e?' – '+esc(e.name):'')};
-const eqOpts=()=>P().equipements.map(e=>[e.code,e.code+' – '+e.name]);
-const techOpts=()=>P().techniciens.map(t=>t.name);
-const ST={'En attente':'amber','En cours':'indigo','Clôturée':'emerald','Planifié':'blue','Réalisé':'emerald'},PR={Haute:'red',Moyenne:'amber',Basse:'slate'};
-const del=(expr)=>isAdmin()?lnk('Suppr.',`if(confirm('Supprimer ?')){${expr};save();render()}`):'';
+const esc = s =>
+    String(s ?? '').replace(
+        /[&<>"']/g,
+        c => ({
+            '&':'&amp;',
+            '<':'&lt;',
+            '>':'&gt;',
+            '"':'&quot;',
+            "'":'&#39;'
+        }[c])
+    );
 
-function form(title,fs,ok){
- const inp='w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white mt-1';
- const f=x=>{const v=esc(x.v??''),r=x.r?'required':'';let c;
-  if(x.t==='select')c=`<select name="${x.n}" class="${inp}">${x.o.map(q=>{q=Array.isArray(q)?q:[q,q];return`<option value="${esc(q[0])}" ${q[0]===x.v?'selected':''}>${esc(q[1])}</option>`}).join('')}</select>`;
-  else if(x.t==='area')c=`<textarea name="${x.n}" rows="2" ${r} class="${inp}">${v}</textarea>`;
-  else c=`<input name="${x.n}" type="${x.t||'text'}" value="${v}" ${r} ${x.t==='number'?`step="${x.s||'any'}" min="0"`:''} class="${inp}">`;
-  return`<label class="block text-[11px] text-slate-400">${esc(x.l)}${c}</label>`};
- $('modal').innerHTML=`<div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 space-y-3 max-h-[90vh] overflow-auto"><h3 class="font-bold text-sm">${esc(title)}</h3><form id="gf" class="space-y-3" autocomplete="off">${fs.map(f).join('')}<p id="gerr" class="hidden text-xs text-red-400"></p><div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeM()" class="text-xs text-slate-400">Annuler</button><button class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl text-xs font-semibold">Valider</button></div></form></div>`;
- $('modal').classList.remove('hidden');
- $('gf').onsubmit=async e=>{e.preventDefault();const r=await ok(Object.fromEntries(new FormData(e.target)));if(typeof r==='string'){$('gerr').textContent=r;$('gerr').classList.remove('hidden');return}if(db)save();closeM();render()}}
-function closeM(){$('modal').classList.add('hidden');$('modal').innerHTML=''}
 
-/* ---------- Rendu ---------- */
-const go=t=>{tab=t;render()};
-function render(){
- $('who').textContent=me.user+' · '+(isAdmin()?'Admin':'Technicien');
- $('co').innerHTML=Object.keys(db).map(k=>`<option value="${esc(k)}" ${k===cur?'selected':''}>${esc(db[k].name)}</option>`).join('');
- $('addco').classList.toggle('hidden',!isAdmin());$('rest').classList.toggle('hidden',!isAdmin());
- const tabs=[['dash','🏭 Vue globale'],['di','📋 DI / Ordres de travail'],['plan','📅 Préventif'],['pannes','⚠️ Pannes'],['struct','🧩 Structure'],['kpi','📊 KPIs'],['stock','📦 Stock'],['rep','🧾 Rapport']];
- if(isAdmin())tabs.push(['users','👥 Utilisateurs']);if(!tabs.some(t=>t[0]===tab))tab='dash';
- $('tabs').innerHTML=tabs.map(([k,l])=>`<button onclick="go('${k}')" class="px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap ${k===tab?'text-indigo-300 bg-indigo-500/10 border border-indigo-500/30':'text-slate-400 hover:text-white'}">${l}</button>`).join('');
- $('view').innerHTML=({dash:viewDash,di:viewDI,plan:viewPlan,pannes:viewPannes,struct:viewStruct,kpi:viewKpi,stock:viewStock,rep:viewRep,users:viewUsers})[tab]();
- if(tab==='kpi')drawChart()}
-function addCo(){form('Nouvelle société / projet',[{n:'name',l:'Nom',r:1}],d=>{const k='Proj_'+Date.now();db[k]={name:d.name,zones:[],equipements:[],subEquipements:[],techniciens:[],di:[],planning:[],pannes:[],stock:[]};cur=k})}
+let db;
+let cur;
+let me;
 
-function viewDash(){const p=P(),t=today();
- const late=p.planning.filter(x=>x.status!=='Réalisé'&&x.date<t).length,low=p.stock.filter(s=>s.qty<=s.min).length,open=p.di.filter(d=>d.status!=='Clôturée').length,urg=p.di.filter(d=>d.status!=='Clôturée'&&d.priority==='Haute').length;
- const c=(ic,n,l,tb,col)=>`<button onclick="go('${tb}')" class="bg-slate-900 border border-${col}-500/30 p-4 rounded-2xl text-center hover:scale-105 transition"><div class="text-2xl">${ic}</div><div class="text-lg font-bold text-white">${n}</div><div class="text-[10px] text-slate-400">${l}</div></button>`;
- return card('🏭 '+esc(p.name),`<div class="grid grid-cols-2 md:grid-cols-6 gap-3">${c('📋',open,'DI ouvertes','di','amber')}${c('🚨',urg,'Urgentes (Haute)','di','red')}${c('📅',late,'Préventif en retard','plan','indigo')}${c('⚠️',p.pannes.length,'Pannes','pannes','red')}${c('📦',low,'Stock en alerte','stock','emerald')}${c('🔧',p.equipements.length,'Équipements','struct','blue')}</div>`,btn('amber','＋ DI','newDI()')+btn('indigo','＋ Planifier','newPL()'))}
+let tab = 'dash';
 
-/* DI / OT */
-function newDI(){form('Nouvelle demande d\'intervention',[{n:'date',l:'Date',t:'date',v:today(),r:1},{n:'machine',l:'Équipement',t:'select',o:eqOpts()},{n:'desc',l:'Description',t:'area',r:1},{n:'priority',l:'Priorité',t:'select',o:['Haute','Moyenne','Basse'],v:'Moyenne'}],d=>{if(!d.machine)return'Ajoutez d\'abord un équipement (onglet Structure).';P().di.push({id:nextId(),...d,status:'En attente'})})}
-function startDI(id){form('Démarrer '+id,[{n:'tech',l:'Technicien assigné',t:'select',o:techOpts()}],d=>{const x=di(id);x.tech=d.tech;x.status='En cours';x.start=today()})}
-function closeDI(id){form('Clôturer '+id,[{n:'hours',l:'Durée d\'intervention (h)',t:'number',v:1,r:1},{n:'note',l:'Compte rendu de clôture',t:'area',r:1}],d=>{const x=di(id);x.status='Clôturée';x.closeDate=today();x.hours=+d.hours;x.note=d.note})}
-function reopenDI(id){const x=di(id);x.status='En cours';delete x.closeDate;save();render()}
-function viewDI(){const l=P().di.filter(d=>diF==='Tous'||d.status===diF).slice().reverse();
- const f=['Tous','En attente','En cours','Clôturée'].map(s=>`<button onclick="diF='${s}';render()" class="px-3 py-1 rounded-lg text-[11px] ${diF===s?'bg-indigo-600 text-white':'bg-slate-800 text-slate-300'}">${s}</button>`).join('');
- return card('📋 Demandes d\'intervention & Ordres de travail',`<div class="flex gap-2 flex-wrap">${f}</div>`+tbl(['N° OT','Date','Équipement','Description','Priorité','Technicien','Statut','Délai','Actions'],l.map(d=>[
-  `<b>${esc(d.id)}</b>`,esc(d.date),eq(d.machine),esc(d.desc)+(d.note?`<div class="text-slate-500 mt-1">Clôture : ${esc(d.note)}${d.hours?' ('+d.hours+' h)':''}</div>`:''),badge(d.priority,PR[d.priority]||'slate'),esc(d.tech||'-'),badge(d.status,ST[d.status]||'slate'),
-  days(d.date,d.status==='Clôturée'?d.closeDate||d.date:today())+' j',
-  (d.status==='En attente'?lnk('Démarrer',`startDI('${d.id}')`,'text-indigo-300'):'')+(d.status==='En cours'?lnk('Clôturer',`closeDI('${d.id}')`,'text-emerald-400'):'')+(d.status==='Clôturée'&&isAdmin()?lnk('Rouvrir',`reopenDI('${d.id}')`,'text-amber-400'):'')+del(`P().di=P().di.filter(x=>x.id!=='${d.id}')`)])),btn('amber','＋ Nouvelle DI','newDI()'))}
+let diF = 'Tous';
 
-/* Préventif */
-const FQ={Hebdomadaire:7,Mensuel:30,Trimestriel:90};
-function newPL(){form('Planifier une maintenance préventive',[{n:'date',l:'Date prévue',t:'date',v:today(),r:1},{n:'machine',l:'Équipement',t:'select',o:eqOpts()},{n:'task',l:'Tâche / opération',r:1},{n:'freq',l:'Fréquence',t:'select',o:Object.keys(FQ),v:'Mensuel'},{n:'tech',l:'Technicien',t:'select',o:techOpts()}],d=>{if(!d.machine)return'Ajoutez d\'abord un équipement.';P().planning.push({...d,status:'Planifié'})})}
-function donePL(i){const p=P().planning[i];p.status='Réalisé';p.doneDate=today();const d=new Date(p.date);d.setDate(d.getDate()+FQ[p.freq]);P().planning.push({date:d.toISOString().slice(0,10),machine:p.machine,task:p.task,freq:p.freq,tech:p.tech,status:'Planifié'});save();render()}
-function viewPlan(){const t=today(),l=P().planning.map((p,i)=>({p,i})).sort((a,b)=>a.p.date.localeCompare(b.p.date));
- return card('📅 Planning de maintenance préventive',tbl(['Date prévue','Équipement','Tâche','Fréquence','Technicien','Statut','Actions'],l.map(({p,i})=>[
-  `<span class="${p.status!=='Réalisé'&&p.date<t?'text-red-400 font-bold':''}">${esc(p.date)}</span>`,eq(p.machine),esc(p.task),esc(p.freq),esc(p.tech),badge(p.status,ST[p.status]||'slate'),
-  (p.status!=='Réalisé'?lnk('Réalisé ✓ (replanifier)',`donePL(${i})`,'text-emerald-400'):'')+del(`P().planning.splice(${i},1)`)])),btn('indigo','＋ Planifier','newPL()'))}
+let kp = {
+    from:'',
+    to:'',
+    hours:500
+};
 
-/* Pannes */
-function newPanne(){form('Déclarer une panne',[{n:'date',l:'Date',t:'date',v:today(),r:1},{n:'machine',l:'Équipement',t:'select',o:eqOpts()},{n:'subEq',l:'Sous-équipement',t:'select',o:[['','—'],...P().subEquipements.map(s=>[s.name,s.parent+' › '+s.name])]},{n:'desc',l:'Symptôme / cause',t:'area',r:1},{n:'part',l:'Pièce utilisée (−1 au stock)',t:'select',o:[['','Aucune'],...P().stock.map(s=>[s.ref,s.name+' ('+s.ref+')'])]},{n:'tech',l:'Technicien',t:'select',o:techOpts()},{n:'hours',l:'Durée d\'arrêt (h)',t:'number',v:1,r:1}],d=>{
- if(!d.machine)return'Ajoutez d\'abord un équipement.';if(!(+d.hours>0))return'Durée invalide.';
- if(d.part){const s=P().stock.find(x=>x.ref===d.part);if(s&&s.qty>0)s.qty--}
- P().pannes.push({...d,part:d.part||'-',hours:+d.hours})})}
-function viewPannes(){const l=P().pannes.map((x,i)=>({x,i})).reverse();
- return card('⚠️ Journal des pannes & pièces consommées',tbl(['Date','Équipement','Sous-éq.','Symptôme','Pièce','Arrêt','Technicien','Action'],l.map(({x,i})=>[esc(x.date),eq(x.machine),esc(x.subEq||'-'),esc(x.desc),`<span class="text-emerald-400">${esc(x.part)}</span>`,`<b class="text-red-400">${x.hours} h</b>`,esc(x.tech),del(`P().pannes.splice(${i},1)`)])),btn('red','＋ Déclarer panne','newPanne()'))}
+let chart;
 
-/* Structure */
-const SL={zones:['Zones',z=>esc(z)],equipements:['Équipements',e=>`<b>${esc(e.code)}</b> – ${esc(e.name)} <span class="text-slate-500">(${esc(e.zone||'-')})</span>`],subEquipements:['Sous-équipements',s=>`${esc(s.parent)} › ${esc(s.name)}`],techniciens:['Techniciens',t=>esc(t.name)+(t.spec?` <span class="text-slate-500">(${esc(t.spec)})</span>`:'')]};
-function addS(k){const f={zones:[{n:'name',l:'Nom de la zone',r:1}],equipements:[{n:'zone',l:'Zone',t:'select',o:P().zones},{n:'code',l:'Code (EQ-02)',r:1},{n:'name',l:'Nom',r:1}],subEquipements:[{n:'parent',l:'Équipement',t:'select',o:eqOpts()},{n:'name',l:'Nom',r:1}],techniciens:[{n:'name',l:'Nom complet',r:1},{n:'spec',l:'Spécialité'}]}[k];
- form('Ajouter',f,d=>{if(k==='equipements'&&P().equipements.some(e=>e.code===d.code))return'Code déjà utilisé.';P()[k].push(k==='zones'?d.name:d)})}
-function viewStruct(){return`<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">${Object.entries(SL).map(([k,[t,fn]])=>`<div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3"><div class="flex justify-between items-center border-b border-slate-800 pb-2"><h3 class="font-bold text-xs">${t}</h3>${isAdmin()?`<button onclick="addS('${k}')" class="bg-indigo-600 px-2 py-1 rounded text-xs">＋</button>`:''}</div><ul class="space-y-1 text-xs text-slate-300">${P()[k].map((x,i)=>`<li class="flex justify-between items-center py-1 gap-2"><span>${fn(x)}</span>${del(`P().${k}.splice(${i},1)`)}</li>`).join('')||'<li class="text-slate-500">Vide</li>'}</ul></div>`).join('')}</div>`}
+let note =
+    'Synthèse des interventions, pannes et état du stock.';
 
-/* Stock */
-const okImg=u=>/^(https?:|data:image)/.test(u||'');
-function newStock(){form('Ajouter une pièce',[{n:'ref',l:'Référence',r:1},{n:'name',l:'Désignation',r:1},{n:'loc',l:'Emplacement'},{n:'image',l:'Lien de l\'image (URL)'},{n:'qty',l:'Quantité',t:'number',v:10,s:1},{n:'min',l:'Seuil minimum',t:'number',v:2,s:1}],d=>{if(P().stock.some(s=>s.ref===d.ref))return'Référence déjà existante.';P().stock.push({...d,qty:+d.qty,min:+d.min})})}
-function entStock(i){form('Entrée de stock',[{n:'q',l:'Quantité reçue',t:'number',v:1,s:1,r:1}],d=>{P().stock[i].qty+=Math.round(+d.q)})}
-function viewStock(){return card('📦 Stock & images des pièces',tbl(['Image','Référence','Désignation','Emplacement','Qté','Seuil','Statut','Actions'],P().stock.map((s,i)=>[
- okImg(s.image)?`<img src="${esc(s.image)}" class="w-10 h-10 object-cover rounded-lg border border-slate-700" onerror="this.replaceWith('📦')">`:'📦',`<b>${esc(s.ref)}</b>`,esc(s.name),esc(s.loc||'-'),`<b>${s.qty}</b>`,s.min,badge(s.qty<=s.min?'Alerte stock':'Normal',s.qty<=s.min?'red':'emerald'),lnk('+ Entrée',`entStock(${i})`,'text-emerald-400')+del(`P().stock.splice(${i},1)`)])),isAdmin()?btn('indigo','＋ Ajouter pièce','newStock()'):'')}
 
-/* KPIs */
-function kpiData(){const p=P(),H=kp.hours,N=Math.max(1,p.equipements.length),list=p.pannes.filter(x=>inP(x.date)),per={};
- list.forEach(x=>{const m=per[x.machine]??={n:0,h:0};m.n++;m.h+=x.hours});
- const rows=Object.entries(per).map(([m,v])=>{const up=Math.max(0,H-v.h);return{m,n:v.n,h:v.h,mttr:v.h/v.n,mtbf:up/v.n,disp:up/H*100}}).sort((a,b)=>b.h-a.h);
- const n=list.length,h=list.reduce((s,x)=>s+x.hours,0),tot=H*N;
- return{rows,n,h,mttr:n?h/n:0,mtbf:n?Math.max(0,tot-h)/n:tot,disp:Math.max(0,tot-h)/tot*100}}
-const filt=()=>`<div class="flex gap-3 items-end flex-wrap text-[11px] text-slate-400"><label>Du<input type="date" value="${kp.from}" onchange="kp.from=this.value;render()" class="${I}"></label><label>Au<input type="date" value="${kp.to}" onchange="kp.to=this.value;render()" class="${I}"></label><label>Heures de fonct. / machine<input type="number" min="1" value="${kp.hours}" onchange="kp.hours=Math.max(1,+this.value||500);render()" class="${I} w-32"></label></div>`;
-function viewKpi(){const k=kpiData(),p=P(),cl=p.di.filter(d=>d.status==='Clôturée'),avg=cl.length?(cl.reduce((s,d)=>s+days(d.date,d.closeDate||d.date),0)/cl.length).toFixed(1)+' j':'--',due=p.planning.filter(x=>x.date<=today()),pm=due.length?Math.round(due.filter(x=>x.status==='Réalisé').length/due.length*100)+' %':'--';
- const c=(l,v,col)=>`<div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl"><div class="text-[10px] font-bold text-slate-400 uppercase">${l}</div><div class="text-2xl font-extrabold text-${col}-400 mt-1">${v}</div></div>`;
- return card('📊 Indicateurs',filt())+`<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${c('MTBF',k.mtbf.toFixed(0)+' h','indigo')}${c('MTTR',k.mttr.toFixed(1)+' h','amber')}${c('Disponibilité',k.disp.toFixed(1)+' %','emerald')}${c('Total arrêt',k.h.toFixed(1)+' h','red')}${c('DI ouvertes',p.di.length-cl.length,'amber')}${c('DI clôturées',cl.length,'emerald')}${c('Délai moyen de clôture',avg,'indigo')}${c('Préventif réalisé',pm,'blue')}</div>`+
- card('Pareto des arrêts par équipement','<div class="h-72"><canvas id="pareto"></canvas></div>')+card('Détail par équipement',tbl(['Équipement','Pannes','Arrêt (h)','MTTR (h)','MTBF (h)','Disponibilité'],k.rows.map(r=>[eq(r.m),r.n,r.h.toFixed(1),r.mttr.toFixed(1),r.mtbf.toFixed(0),r.disp.toFixed(1)+' %']),'Aucune panne sur la période'),btn('emerald','📥 Exporter Excel','xlsx()'))}
-function drawChart(){const c=$('pareto');if(!c||typeof Chart==='undefined')return;chart?.destroy();const k=kpiData(),tot=k.h||1;let a=0;
- chart=new Chart(c,{data:{labels:k.rows.map(r=>r.m),datasets:[{type:'bar',label:'Arrêt (h)',data:k.rows.map(r=>r.h),backgroundColor:'#6366f1',yAxisID:'y'},{type:'line',label:'Cumul %',data:k.rows.map(r=>+(a+=r.h,a/tot*100).toFixed(1)),borderColor:'#f59e0b',yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{color:'#94a3b8'}},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false},ticks:{color:'#f59e0b'}},x:{ticks:{color:'#94a3b8'}}},plugins:{legend:{labels:{color:'#cbd5e1'}}}}})}
+const P = () =>
+    db[cur];
 
-/* Rapport (impression / PDF) */
-function viewRep(){const p=P(),k=kpiData(),d=p.di.filter(x=>inP(x.date)),pl=p.planning.filter(x=>inP(x.date)),pn=p.pannes.filter(x=>inP(x.date)),low=p.stock.filter(s=>s.qty<=s.min);
- return card('🧾 Rapport de maintenance',filt(),btn('slate','🖨️ Imprimer / PDF','window.print()')+btn('emerald','📥 Excel','xlsx()'))+
- `<div id="printable" class="p-6 rounded-xl space-y-4 text-xs"><div class="flex justify-between border-b pb-3"><div><h3 class="text-lg font-bold">RAPPORT DE MAINTENANCE</h3><p>${esc(p.name)} — du ${esc(kp.from||'début')} au ${esc(kp.to||today())}</p></div><p>Édité par ${esc(me.user)} le ${today()}</p></div>
- <textarea rows="3" oninput="note=this.value" class="w-full border rounded p-2 text-xs" style="color:#0f172a;background:#fff">${esc(note)}</textarea>
- <p><b>MTBF</b> ${k.mtbf.toFixed(0)} h · <b>MTTR</b> ${k.mttr.toFixed(1)} h · <b>Disponibilité</b> ${k.disp.toFixed(1)} % · <b>Arrêt total</b> ${k.h.toFixed(1)} h · <b>Pannes</b> ${k.n}</p>
- <h4 class="font-bold">DI / Ordres de travail (${d.length})</h4>${tbl(['N°','Date','Équipement','Description','Priorité','Technicien','Statut'],d.map(x=>[esc(x.id),esc(x.date),eq(x.machine),esc(x.desc),esc(x.priority),esc(x.tech||'-'),esc(x.status)]))}
- <h4 class="font-bold">Pannes (${pn.length})</h4>${tbl(['Date','Équipement','Symptôme','Pièce','Arrêt','Technicien'],pn.map(x=>[esc(x.date),eq(x.machine),esc(x.desc),esc(x.part),x.hours+' h',esc(x.tech)]))}
- <h4 class="font-bold">Préventif (${pl.length})</h4>${tbl(['Date','Équipement','Tâche','Technicien','Statut'],pl.map(x=>[esc(x.date),eq(x.machine),esc(x.task),esc(x.tech),esc(x.status)]))}
- <h4 class="font-bold">Pièces sous le seuil (${low.length})</h4>${tbl(['Référence','Désignation','Qté','Seuil'],low.map(s=>[esc(s.ref),esc(s.name),s.qty,s.min]),'Aucune alerte')}</div>`}
 
-/* Utilisateurs */
-function viewUsers(){const u=users();return card('👥 Utilisateurs & rôles',`<p class="text-[11px] text-slate-400">Administrateur : accès complet. Technicien : DI/OT, pannes, préventif, entrées de stock, consultation — sans suppression, structure ni gestion des comptes.</p>`+tbl(['Identifiant','Rôle','Actions'],u.map((x,i)=>[esc(x.user)+(x.user===me.user?' (vous)':''),`<select onchange="setRole(${i},this.value)" ${x.user===me.user?'disabled':''} class="${I} mt-0"><option value="tech" ${x.role==='tech'?'selected':''}>Technicien</option><option value="admin" ${x.role==='admin'?'selected':''}>Administrateur</option></select>`,lnk('Réinitialiser le mot de passe',`resetPw(${i})`,'text-amber-400')+(x.user!==me.user?lnk('Supprimer',`delUser(${i})`):'')])),btn('indigo','＋ Nouvel utilisateur','addUser()'))}
+const isAdmin = () =>
+    me && me.role === 'admin';
 
-/* Export / import */
-function xlsx(){if(typeof XLSX==='undefined')return alert('Bibliothèque Excel non chargée (connexion internet requise).');
- const p=P(),wb=XLSX.utils.book_new(),add=(n,r)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(r.length?r:[{}]),n);
- add('DI-OT',p.di.map(d=>({OT:d.id,Date:d.date,Equipement:d.machine,Description:d.desc,Priorite:d.priority,Technicien:d.tech||'',Statut:d.status,Debut:d.start||'',Cloture:d.closeDate||'',Heures:d.hours??'',Compte_rendu:d.note||''})));
- add('Preventif',p.planning.map(x=>({Date:x.date,Equipement:x.machine,Tache:x.task,Frequence:x.freq,Technicien:x.tech,Statut:x.status})));
- add('Pannes',p.pannes.map(x=>({Date:x.date,Equipement:x.machine,Sous_equipement:x.subEq||'',Symptome:x.desc,Piece:x.part,Arret_h:x.hours,Technicien:x.tech})));
- add('Stock',p.stock.map(s=>({Reference:s.ref,Designation:s.name,Emplacement:s.loc||'',Quantite:s.qty,Seuil:s.min})));
- add('KPIs',kpiData().rows.map(r=>({Equipement:r.m,Pannes:r.n,Arret_h:+r.h.toFixed(1),MTTR_h:+r.mttr.toFixed(2),MTBF_h:+r.mtbf.toFixed(0),Disponibilite_pct:+r.disp.toFixed(1)})));
- XLSX.writeFile(wb,`GMAO_${p.name.replace(/\W+/g,'_')}_${today()}.xlsx`)}
-function expJSON(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:'application/json'}));a.download=`GMAO_Pro_Backup_${today()}.json`;document.body.appendChild(a);a.click();a.remove()}
-function imp(e){const f=e.target.files[0];if(!f||!isAdmin())return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d!=='object'||Array.isArray(d)||!Object.keys(d).length)throw 0;Object.values(d).forEach(norm);db=d;cur=Object.keys(db)[0];save();render();alert('Données restaurées.')}catch(x){alert('Fichier invalide.')}};r.readAsText(f);e.target.value=''}
 
-initAuth();applyBg();
-</script>
-</body>
-</html>
+const today = () =>
+    new Date()
+        .toISOString()
+        .slice(0,10);
+
+
+const days = (a,b) =>
+    Math.max(
+        0,
+        Math.round(
+            (new Date(b)-new Date(a))/864e5
+        )
+    );
+
+
+const save = () =>
+    localStorage.setItem(
+        KEY,
+        JSON.stringify(db)
+    );
+
+
+const inP = d =>
+    (!kp.from || d >= kp.from) &&
+    (!kp.to || d <= kp.to);
+
+
+const I =
+    'bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white block mt-1';
+
+
+/* =========================================================
+   DONNÉES PAR DÉFAUT
+========================================================= */
+
+function defaultDB(){
+
+    return {
+
+        Projet_A:{
+
+            name:
+                'Société A - Usine Principale',
+
+            zones:[
+                'Zone Extrusion',
+                'Zone Assemblage'
+            ],
+
+
+            /*
+             * IMPORTANT
+             * Les équipements possèdent maintenant
+             * un code automatique.
+             *
+             * Exemple :
+             * EQ-001
+             * EQ-002
+             */
+
+            equipements:[
+
+                {
+                    code:'EQ-001',
+                    name:'Presse Hydraulique 01',
+                    zone:'Zone Extrusion'
+                }
+
+            ],
+
+
+            /*
+             * Les sous-équipements utilisent
+             * également un code automatique.
+             */
+
+            subEquipements:[
+
+                {
+                    code:'SE-001',
+                    name:'Vérin Principal',
+                    parent:'EQ-001'
+                }
+
+            ],
+
+
+            techniciens:[
+
+                {
+                    name:'Abdelali Bouzid',
+                    spec:'Électromécanique'
+                }
+
+            ],
+
+
+            di:[],
+            planning:[],
+            pannes:[],
+
+            stock:[
+
+                {
+                    ref:'SKF-6204',
+                    name:'Roulement à billes',
+                    loc:'Rayon A1',
+                    image:'',
+                    qty:5,
+                    min:2
+                }
+
+            ]
+
+        }
+
+    };
+
+}
+
+
+/* =========================================================
+   NORMALISATION DES DONNÉES
+========================================================= */
+
+function norm(p){
+
+    [
+        'zones',
+        'equipements',
+        'subEquipements',
+        'techniciens',
+        'di',
+        'planning',
+        'pannes',
+        'stock'
+
+    ].forEach(
+        k => p[k] ??= []
+    );
+
+
+    /*
+     * Compatibilité avec les anciennes données :
+     *
+     * Si un équipement existant n'a pas de code,
+     * on lui attribue automatiquement un EQ.
+     */
+
+    let eqCounter = 0;
+
+    p.equipements.forEach(e => {
+
+        if(!e.code){
+
+            eqCounter++;
+
+            e.code =
+                'EQ-' +
+                String(eqCounter)
+                    .padStart(3,'0');
+
+        }
+
+    });
+
+
+    /*
+     * Recherche du numéro EQ le plus élevé.
+     */
+
+    const maxEQ =
+        Math.max(
+            0,
+            ...p.equipements.map(
+                e =>
+                    parseInt(
+                        String(e.code || '')
+                            .replace(/\D/g,'')
+                    ) || 0
+            )
+        );
+
+
+    /*
+     * Si plusieurs anciens équipements
+     * possèdent déjà des codes, on continue
+     * après le plus grand numéro.
+     */
+
+    eqCounter = maxEQ;
+
+
+    /*
+     * Compatibilité sous-équipements.
+     */
+
+    let seCounter = 0;
+
+    p.subEquipements.forEach(s => {
+
+        if(!s.code){
+
+            seCounter++;
+
+            s.code =
+                'SE-' +
+                String(seCounter)
+                    .padStart(3,'0');
+
+        }
+
+    });
+
+
+    const maxSE =
+        Math.max(
+            0,
+            ...p.subEquipements.map(
+                s =>
+                    parseInt(
+                        String(s.code || '')
+                            .replace(/\D/g,'')
+                    ) || 0
+            )
+        );
+
+
+    seCounter = maxSE;
+
+
+    /*
+     * Compatibilité DI / OT.
+     */
+
+    let n =
+        Math.max(
+            0,
+            ...p.di.map(
+                d =>
+                    +String(
+                        d.id || ''
+                    ).slice(3) || 0
+            )
+        );
+
+
+    p.di.forEach(d => {
+
+        if(!d.id){
+
+            n++;
+
+            d.id =
+                'OT-' +
+                String(n)
+                    .padStart(4,'0');
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   CHARGEMENT DE LA BASE LOCALE
+========================================================= */
+
+function loadDB(){
+
+    let d;
+
+    try{
+
+        d =
+            JSON.parse(
+                localStorage.getItem(KEY)
+            );
+
+    }catch(e){}
+
+
+    db =
+        d &&
+        Object.keys(d).length
+            ? d
+            : defaultDB();
+
+
+    Object.values(db)
+        .forEach(norm);
+
+
+    cur =
+        Object.keys(db)[0];
+
+
+    save();
+
+}
+
+
+/* =========================================================
+   GÉNÉRATION AUTOMATIQUE DES CODES
+========================================================= */
+
+/*
+ * Génère le prochain code équipement.
+ *
+ * EQ-001
+ * EQ-002
+ * EQ-003
+ * ...
+ */
+
+function nextEquipmentCode(){
+
+    const list =
+        P().equipements || [];
+
+
+    const max =
+        Math.max(
+            0,
+            ...list.map(e => {
+
+                const n =
+                    parseInt(
+                        String(e.code || '')
+                            .match(/\d+/)?.[0]
+                    );
+
+                return Number.isFinite(n)
+                    ? n
+                    : 0;
+
+            })
+        );
+
+
+    return (
+        'EQ-' +
+        String(max + 1)
+            .padStart(3,'0')
+    );
+
+}
+
+
+/*
+ * Génère le prochain code sous-équipement.
+ *
+ * SE-001
+ * SE-002
+ * SE-003
+ * ...
+ */
+
+function nextSubEquipmentCode(){
+
+    const list =
+        P().subEquipements || [];
+
+
+    const max =
+        Math.max(
+            0,
+            ...list.map(s => {
+
+                const n =
+                    parseInt(
+                        String(s.code || '')
+                            .match(/\d+/)?.[0]
+                    );
+
+                return Number.isFinite(n)
+                    ? n
+                    : 0;
+
+            })
+        );
+
+
+    return (
+        'SE-' +
+        String(max + 1)
+            .padStart(3,'0')
+    );
+
+}
+
+
+/*
+ * Génération OT existante.
+ */
+
+const nextId = () =>
+    'OT-' +
+    String(
+        Math.max(
+            0,
+            ...P().di.map(
+                d =>
+                    +String(d.id)
+                        .slice(3) || 0
+            )
+        ) + 1
+    ).padStart(4,'0');
+
+
+const di = id =>
+    P().di.find(
+        d => d.id === id
+    );
+
+
+/* =========================================================
+   AUTHENTIFICATION
+========================================================= */
+
+const sha = async t =>
+    [
+        ...new Uint8Array(
+            await crypto.subtle.digest(
+                'SHA-256',
+                new TextEncoder().encode(t)
+            )
+        )
+    ]
+    .map(
+        x =>
+            x.toString(16)
+             .padStart(2,'0')
+    )
+    .join('');
+
+
+const users = () => {
+
+    try{
+
+        const u =
+            JSON.parse(
+                localStorage.getItem(UKEY)
+            );
+
+        if(u && u.length)
+            return u;
+
+    }catch(e){}
+
+
+    try{
+
+        const o =
+            JSON.parse(
+                localStorage.getItem(
+                    'GMAO_PRO_AUTH'
+                )
+            );
+
+        if(o)
+            return [
+                {
+                    ...o,
+                    role:'admin'
+                }
+            ];
+
+    }catch(e){}
+
+
+    return [];
+
+};
+
+
+const saveUsers = u =>
+    localStorage.setItem(
+        UKEY,
+        JSON.stringify(u)
+    );
+
+
+const mk = async (
+    user,
+    pass,
+    role
+) => {
+
+    const salt =
+        crypto.randomUUID();
+
+
+    return {
+
+        user,
+
+        salt,
+
+        hash:
+            await sha(
+                salt + pass
+            ),
+
+        role
+
+    };
+
+};
+
+
+const amsg = m => {
+
+    $('am').textContent = m;
+
+    $('am')
+        .classList
+        .remove('hidden');
+
+};
+
+
+let fails = 0;
+let lock = 0;
+
+
+/* =========================================================
+   INITIALISATION AUTH
+========================================================= */
+
+function initAuth(){
+
+    if(!users().length){
+
+        $('cw')
+            .classList
+            .remove('hidden');
+
+        $('lc').required = true;
+
+        $('ab').textContent =
+            'Créer le compte administrateur';
+
+    }
+
+}
+
+
+/* =========================================================
+   CONNEXION
+========================================================= */
+
+async function login(e){
+
+    e.preventDefault();
+
+
+    if(Date.now() < lock){
+
+        return amsg(
+            'Trop d\'essais. Patientez 30 secondes.'
+        );
+
+    }
+
+
+    const u =
+        $('lu')
+            .value
+            .trim();
+
+
+    const p =
+        $('lp')
+            .value;
+
+
+    const us =
+        users();
+
+
+    /*
+     * Première connexion :
+     * création du compte administrateur.
+     */
+
+    if(!us.length){
+
+        if(p.length < 6)
+
+            return amsg(
+                'Mot de passe : 6 caractères minimum.'
+            );
+
+
+        if(
+            p !==
+            $('lc').value
+        )
+
+            return amsg(
+                'Les mots de passe ne correspondent pas.'
+            );
+
+
+        me =
+            await mk(
+                u,
+                p,
+                'admin'
+            );
+
+
+        saveUsers([
+            me
+        ]);
+
+    }
+
+    else{
+
+        const a =
+            us.find(
+                x =>
+                    x.user
+                        .toLowerCase()
+                    ===
+                    u.toLowerCase()
+            );
+
+
+        if(
+            !a ||
+            await sha(
+                a.salt + p
+            ) !== a.hash
+        ){
+
+            if(++fails >= 5){
+
+                lock =
+                    Date.now() + 30000;
+
+                fails = 0;
+
+            }
+
+
+            return amsg(
+                'Identifiant ou mot de passe incorrect.'
+            );
+
+        }
+
+
+        me = a;
+
+        fails = 0;
+
+    }
+
+
+    $('lp').value = '';
+    $('lc').value = '';
+
+    $('am')
+        .classList
+        .add('hidden');
+
+
+    $('auth')
+        .classList
+        .add('hidden');
+
+
+    $('app')
+        .classList
+        .remove('hidden');
+
+
+    loadDB();
+
+    tab = 'dash';
+
+    render();
+
+}
+
+
+/* =========================================================
+   DÉCONNEXION
+========================================================= */
+
+function logout(){
+
+    me = null;
+    db = null;
+
+    $('lp').value = '';
+
+    $('app')
+        .classList
+        .add('hidden');
+
+    $('auth')
+        .classList
+        .remove('hidden');
+
+    $('view').innerHTML = '';
+
+}
+
+
+/* =========================================================
+   CHANGEMENT MOT DE PASSE
+========================================================= */
+
+function myPw(){
+
+    form(
+        'Changer mon mot de passe',
+
+        [
+            {
+                n:'o',
+                l:'Ancien mot de passe',
+                t:'password',
+                r:1
+            },
+
+            {
+                n:'n',
+                l:'Nouveau (6 min.)',
+                t:'password',
+                r:1
+            },
+
+            {
+                n:'c',
+                l:'Confirmer',
+                t:'password',
+                r:1
+            }
+
+        ],
+
+        async d => {
+
+            const us =
+                users();
+
+            const a =
+                us.find(
+                    x =>
+                        x.user === me.user
+                );
+
+
+            if(
+                await sha(
+                    a.salt + d.o
+                ) !== a.hash
+            )
+
+                return
+                    'Ancien mot de passe incorrect.';
+
+
+            if(d.n.length < 6)
+
+                return
+                    'Mot de passe trop court.';
+
+
+            if(d.n !== d.c)
+
+                return
+                    'La confirmation ne correspond pas.';
+
+
+            const n =
+                await mk(
+                    a.user,
+                    d.n,
+                    a.role
+                );
+
+
+            Object.assign(
+                a,
+                n
+            );
+
+
+            saveUsers(us);
+
+            me = a;
+
+            return null;
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   UTILISATEURS
+========================================================= */
+
+const admins =
+    us =>
+        us.filter(
+            x =>
+                x.role === 'admin'
+        ).length;
+
+
+function addUser(){
+
+    form(
+        'Nouvel utilisateur',
+
+        [
+            {
+                n:'user',
+                l:'Identifiant',
+                r:1
+            },
+
+            {
+                n:'pw',
+                l:'Mot de passe (6 min.)',
+                t:'password',
+                r:1
+            },
+
+            {
+                n:'role',
+                l:'Rôle',
+                t:'select',
+                o:[
+                    [
+                        'tech',
+                        'Technicien'
+                    ],
+                    [
+                        'admin',
+                        'Administrateur'
+                    ]
+                ]
+            }
+
+        ],
+
+        async d => {
+
+            const u =
+                users();
+
+
+            if(
+                d.pw.length < 6
+            )
+
+                return
+                    'Mot de passe trop court.';
+
+
+            if(
+                u.some(
+                    x =>
+                        x.user
+                            .toLowerCase()
+                        ===
+                        d.user
+                            .toLowerCase()
+                )
+            )
+
+                return
+                    'Identifiant déjà utilisé.';
+
+
+            u.push(
+                await mk(
+                    d.user.trim(),
+                    d.pw,
+                    d.role
+                )
+            );
+
+
+            saveUsers(u);
+
+        }
+
+    );
+
+}
+
+
+function setRole(i,r){
+
+    const u =
+        users();
+
+
+    if(
+        u[i].role === 'admin' &&
+        r !== 'admin' &&
+        admins(u) < 2
+    ){
+
+        alert(
+            'Il faut au moins un administrateur.'
+        );
+
+        return render();
+
+    }
+
+
+    u[i].role = r;
+
+    saveUsers(u);
+
+    render();
+
+}
+
+
+function resetPw(i){
+
+    form(
+        'Nouveau mot de passe',
+
+        [
+            {
+                n:'n',
+                l:'Nouveau mot de passe (6 min.)',
+                t:'password',
+                r:1
+            }
+        ],
+
+        async d => {
+
+            if(d.n.length < 6)
+
+                return
+                    'Mot de passe trop court.';
+
+
+            const u =
+                users();
+
+
+            Object.assign(
+                u[i],
+                await mk(
+                    u[i].user,
+                    d.n,
+                    u[i].role
+                )
+            );
+
+
+            saveUsers(u);
+
+            return null;
+
+        }
+
+    );
+
+}
+
+
+function delUser(i){
+
+    const u =
+        users();
+
+
+    if(
+        u[i].user === me.user
+    )
+
+        return alert(
+            'Vous ne pouvez pas supprimer votre propre compte.'
+        );
+
+
+    if(
+        !confirm(
+            'Supprimer ' +
+            u[i].user +
+            ' ?'
+        )
+    )
+
+        return;
+
+
+    u.splice(i,1);
+
+    saveUsers(u);
+
+    render();
+
+}
+
+
+/* =========================================================
+   ARRIÈRE-PLAN
+========================================================= */
+
+function applyBg(){
+
+    let b = '';
+
+    try{
+
+        b =
+            localStorage.getItem(BGK)
+            || '';
+
+    }catch(e){}
+
+
+    if(b){
+
+        document.body.style.setProperty(
+            '--bg',
+            'url("' + b + '")'
+        );
+
+        document.body.classList.add(
+            'has-bg'
+        );
+
+    }
+
+    else{
+
+        document.body.classList.remove(
+            'has-bg'
+        );
+
+    }
+
+}
+
+
+function setBg(e){
+
+    const f =
+        e.target.files[0];
+
+
+    if(!f)
+        return;
+
+
+    const u =
+        URL.createObjectURL(f);
+
+
+    const im =
+        new Image();
+
+
+    im.onload = () => {
+
+        const r =
+            Math.min(
+                1,
+                1600 / im.width
+            );
+
+
+        const c =
+            document.createElement(
+                'canvas'
+            );
+
+
+        c.width =
+            im.width * r;
+
+
+        c.height =
+            im.height * r;
+
+
+        c.getContext('2d')
+            .drawImage(
+                im,
+                0,
+                0,
+                c.width,
+                c.height
+            );
+
+
+        try{
+
+            localStorage.setItem(
+                BGK,
+                c.toDataURL(
+                    'image/jpeg',
+                    .7
+                )
+            );
+
+        }catch(x){
+
+            alert(
+                'Image trop lourde.'
+            );
+
+        }
+
+
+        URL.revokeObjectURL(u);
+
+        applyBg();
+
+    };
+
+
+    im.src = u;
+
+    e.target.value = '';
+
+}
+
+
+function resetBg(){
+
+    localStorage.removeItem(BGK);
+
+    applyBg();
+
+}
+
+
+/* =========================================================
+   FIN PARTIE 1/3
+========================================================= */
